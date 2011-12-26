@@ -1,0 +1,6 @@
+#TITLE Portamento Test
+#COMPOSER Craig Campbell
+AB t130
+@v0 = { 10 }
+@v1 = { 5 }
+A @@2 @v0 o2 [a16 > c16 e16 a16]4 [a16 > c16 e16 a16]4

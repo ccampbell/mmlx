@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+
+# Copyright 2011 Craig Campbell
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import getopt, sys, os
+from lib.listener import Listener
+from lib.musicbox import MusicBox
+from lib.logger import Logger
+
+def showUsage():
+    print "usage"
+    sys.exit(0)
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "", ["verbose", "help", "watch="])
+except:
+    showUsage()
+
+verbose = False
+start = None
+file_list = {}
+for key, value in opts:
+    if key == "--help":
+        showUsage()
+    elif key == "--verbose":
+        verbose = True
+    elif key == "--watch":
+        bits = value.split(':')
+        start = bits[0]
+        if len(bits) == 1:
+            end = bits[0]
+            continue;
+
+        end = bits[1]
+
+if start is None:
+    print "file or directory to watch is required"
+    showUsage()
+
+if not os.path.isfile(start) and not os.path.isdir(start):
+    print start,"is not a file or directory"
+    showUsage()
+
+# try:
+logger = Logger(verbose)
+listener = Listener(logger)
+musicbox = MusicBox(logger)
+listener.onChange(musicbox.processFile)
+listener.watch(start, end)
+# except:
+    # sys.exit(1)
+    # pass

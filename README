@@ -1,0 +1,9 @@
+XMML is short for eXtended MML.  It allows you to do things that you cannot do using traditional MML.
+
+XMML allows you to:
+- define and use instrument patches
+- use portamento to slide from note to note
+- store data in variables
+- transpose to any key
+- target notes directly without having to worry about jumping up and down octaves
+- generate random sounds

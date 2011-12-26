@@ -1,11 +1,15 @@
 #TITLE Portamento Test
 #COMPOSER Craig Campbell
-#TRANSPOSE -2
+
+/* XMML Variables */
+#X-ABSOLUTE-NOTES
+#X-TRANSPOSE 0
 
 AB t130
 
 @v0 = { 10 }
 @v1 = { 5 }
+
 /*===========================
 Song :
 @EN0 = { 0 0 3 0 0 4 0 0 5 0 0 }
@@ -19,6 +23,10 @@ A q4 l8SD1 c e- g e- c e- g e- c w1 SD2 c e- g e- c e- g e- c w1 SD3 c e- g e- c
 A l4 @v0 o4 @02 l4 q4 SD0 @vr1 [e e EN1 c ENOF g f+ f+ EN1 d ENOF a < b b EN1 g ENOF d b b EN0 e ENOF d]2 SDOF ; r4 q4 c d e d c SDOF
 C o4 [c c e8 e8 g8 g8 d d f+8 f+8 a8 a8 g g b8 b8 d8 d8 e e g8 g8 b8 b8]2*/
 
-A @@2 @v0 [A2/16 C3/16 E3/16 A3/16]4 [a16 > c16 e16 a16]4
+A @@2 @v0 [a2,16 c3,16 e3,16 a3,16]4
+A         [f2,16 a2,16 c3,16 f3,16]4
+A         [c2,16 e2,16 g2,16 c3,16]4
+A         [e2,16 g+2,16 b2,16 e3,16]4
+
 ; B c c c c; EP1 d2 ENOF EP0 e2 EPOF EP1 f2 EPOF
 ; B l4 @v0 o3 @02 c2 g2 > c2

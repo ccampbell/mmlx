@@ -4,13 +4,16 @@ class WarpWhistle(object):
     TEMPO = 'tempo'
     VOLUME = 'volume'
     TIMBRE = 'timbre'
-    OCTAVE = None
+    ABSOLUTE_NOTES = 'ABSOLUTE-NOTES'
+    TRANSPOSE = 'TRANSPOSE'
+    OCTAVE = 'octave'
 
     def __init__(self, content, logger):
         self.content = content
         self.logger = logger
-        self.transpose = 0
         self.current_voices = []
+        self.global_vars = {}
+        self.vars = {}
         self.data = {}
 
     def getDataForVoice(self, voice, key):
@@ -32,9 +35,24 @@ class WarpWhistle(object):
         for voice in voices:
             self.setDataForVoice(voice, key, value)
 
+    def getVar(self, key):
+        if key in self.vars:
+            return self.vars[key]
+
+        return None
+
+    def getGlobalVar(self, key):
+        if key in self.global_vars:
+            return self.global_vars[key]
+
+        if key == WarpWhistle.TRANSPOSE:
+            return 0
+
+        return None
+
     def stripComments(self, content):
         # replace all /* comments */
-        content = re.sub(re.compile(r'(/\*(.*)\*/)', re.MULTILINE | re.DOTALL), '', content)
+        content = re.sub(re.compile(r'(/\*(.*?)\*/)', re.MULTILINE | re.DOTALL), '', content)
 
         # replace all ; comments
         content = re.sub(re.compile(r'(;.*)$', re.MULTILINE), '', content)
@@ -44,17 +62,21 @@ class WarpWhistle(object):
 
         return content
 
-    def collapseSpaces(self, content):
+    def collapseSpaces(self, content, new_lines = True):
         # collapse multiple spaces into a single space
-        return re.sub(re.compile(r'\s{2,}', re.MULTILINE), ' ', content)
+        pattern = '\s{2,}' if new_lines else ' {2,}'
+        return re.sub(re.compile(pattern, re.MULTILINE), ' ', content)
 
     def processVariables(self, content):
-        matches = re.search(r'#TRANSPOSE\s{1,}((\+|\-)?(\d+))\n', content)
-        num = '-' if matches.group(2) == '-' else ''
-        num += matches.group(3)
-        self.transpose = int(num)
+        matches = re.findall(r'(^#X-([-A-Z]+)( {1,}(.*))?\n)', content, re.MULTILINE)
+        for match in matches:
+            if match[1] == WarpWhistle.TRANSPOSE:
+                self.global_vars[match[1]] = int(match[3]) if match[3] else 0
+            else:
+                self.global_vars[match[1]] = match[3] or True
 
-        content = content.replace(matches.group(0), '')
+            content = content.replace(match[0], '')
+
         return content
 
     # def processVoice(self, voice, content):
@@ -68,6 +90,70 @@ class WarpWhistle(object):
         ticks = abs(diff)
         symbol = '>' if diff > 0 else '<'
         return symbol * ticks
+
+    def getNumberForNote(self):
+        return {
+            'c': 0,
+            'c+': 1,
+            'd-': 1,
+            'd': 2,
+            'd+': 3,
+            'e-': 3,
+            'e': 4,
+            'f-': 4,
+            'e+': 5,
+            'f': 5,
+            'f+': 6,
+            'g-': 6,
+            'g': 7,
+            'g+': 8,
+            'a-': 8,
+            'a': 9,
+            'a+': 10,
+            'b-': 10,
+            'b': 11
+        }
+
+    def getNoteForNumber(self):
+        return {
+            0: 'c',
+            1: 'c+',
+            2: 'd',
+            3: 'd+',
+            4: 'e',
+            5: 'f',
+            6: 'f+',
+            7: 'g',
+            8: 'g+',
+            9: 'a',
+            10: 'a+',
+            11: 'b'
+        }
+
+    def transposeNote(self, note, octave, amount, append):
+        if amount == 0:
+            return note + append
+
+        new_note_number = self.getNumberForNote()[note] + amount
+        new_note = ""
+
+        ticks = 0
+        while new_note_number < 0:
+            new_note += '< '
+            ticks += 1
+            new_note_number = new_note_number + 12
+
+        while new_note_number > 11:
+            ticks  -= 1
+            new_note += '> '
+            new_note_number = new_note_number - 12
+
+        new_note += self.getNoteForNumber()[new_note_number]
+
+        char = '<' if ticks < 0 else '>'
+        new_note += append + ' ' + abs(ticks) * char
+
+        return new_note
 
     def processWord(self, word, next_word, prev_word):
         if not word:
@@ -106,14 +192,16 @@ class WarpWhistle(object):
             self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, current_octave + (count if direction == '>' else -count))
             return word
 
-        # rewrite special voices for xmml such as C4 or G+/4^8
-        match = re.match(r'(\[)?([A-G]{1})(\+|\-)?(\d{1,2})(\/(\d+)(\^[0-9\^]+)?)?(\]\d+)?', word)
-        if match:
+        # rewrite special voices for xmml such as c4 or G+/4^8
+        # to use this put the line X-ABSOLUTE-NOTES at the top of your xmml file
+        match = re.match(r'(\[)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})(,(\d+\.?)(\^[0-9\^]+)?)?(\]\d+)?', word)
+        if match and self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
+
             new_word = ""
 
-            current_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
-
             octave = match.group(4)
+
+            current_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
 
             if current_octave is None:
                 new_word += 'o' + octave + ' '
@@ -121,29 +209,57 @@ class WarpWhistle(object):
                 new_word += self.moveToOctave(int(octave), current_octave) + ' '
 
             self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, int(octave))
+            current_octave = int(octave)
 
             if match.group(1):
                 new_word += '['
 
+            note = ""
+
             # note
-            new_word += match.group(2).lower()
+            note += match.group(2).lower()
 
             # accidental
             if match.group(3):
-                new_word += match.group(3)
+                note += match.group(3)
 
+            append = ""
+
+            # tack on the note length
             if match.group(6):
-                new_word += match.group(6)
+                append += match.group(6)
 
+            # tack on any ties (such as ^8^16)
             if match.group(7):
-                new_word +=  match.group(7)
+                append +=  match.group(7)
 
+            # tack on the final repeat value if it is present (]4)
             if match.group(8):
-                new_word += match.group(8)
+                append += match.group(8)
+
+            new_word += self.transposeNote(note, current_octave, self.getGlobalVar(WarpWhistle.TRANSPOSE), append)
 
             return new_word
 
-        # print "PROCESS:",word
+        # regular note
+        match = re.match(r'(\[)?([a-g]{1}(\+|\-)?)(.*)(\]\d+)?', word)
+        if match:
+
+            if "," in word and not self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
+                raise Exception('In order to use absolute notes you have to specify X-ABSOLUTE-NOTES')
+
+            current_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
+
+            new_note = ""
+            if match.group(1):
+                new_note += match.group(1)
+
+            new_note += self.transposeNote(match.group(2), current_octave, self.getGlobalVar(WarpWhistle.TRANSPOSE), match.group(4))
+
+            return new_note
+
+
+        print "PROCESS:",word
         # print "PREV:",prev_word
         # print "NEXT:",next_word
         # print ""
@@ -177,13 +293,18 @@ class WarpWhistle(object):
         self.logger.log('collapsing spaces', True)
         content = self.collapseSpaces(content)
 
-
         lines = content.split('\n')
         new_lines = []
         for line in lines:
             new_lines.append(self.processLine(line))
 
-        return '\n'.join(new_lines)
+        content = '\n'.join(new_lines)
+
+        self.logger.log('replace unneccessary octave shifts', True)
+        content = content.replace('> <', '').replace('< >', '')
+        content = self.collapseSpaces(content, False)
+
+        return content
 
     def play(self):
         return self.process(self.content)

@@ -1,4 +1,5 @@
-import re
+import re, os
+from util import Util
 
 class WarpWhistle(object):
     TEMPO = 'tempo'
@@ -49,6 +50,17 @@ class WarpWhistle(object):
             return 0
 
         return None
+
+    def processImports(self, content):
+        matches = re.findall(r'(@import\s{1,}(\'|\")(.*)(\2))$', content, re.MULTILINE)
+
+        for match in matches:
+            filename = match[2] if match[2].endswith('.xmml') else match[2] + '.xmml'
+            disk_path = os.path.join(self.import_directory, filename)
+            file_content = Util.openFile(disk_path)
+            content = content.replace(match[0], file_content)
+
+        return content
 
     def stripComments(self, content):
         # replace all /* comments */
@@ -346,6 +358,9 @@ class WarpWhistle(object):
         return ' '.join(new_words)
 
     def process(self, content):
+        self.logger.log('proccessing imports', True)
+        content = self.processImports(content)
+
         self.logger.log('stripping comments', True)
         content = self.stripComments(content)
 

@@ -1,5 +1,6 @@
-import re
+import re, os
 from warpwhistle import WarpWhistle
+from util import Util
 
 class MusicBox(object):
 
@@ -7,21 +8,13 @@ class MusicBox(object):
         self.logger = logger
 
     def processFile(self, input, output):
-        file = open(input, "r")
-        original_contents = contents = file.read()
-        file.close()
+        original_content = content = Util.openFile(input)
 
-        whistle = WarpWhistle(contents, self.logger)
-        contents = whistle.play()
+        whistle = WarpWhistle(content, self.logger)
+        whistle.import_directory = os.path.dirname(input)
+        content = whistle.play()
 
-        print contents
-        # contents = self.processVoice('A', contents)
-        # contents = self.processVoice('B', contents)
-        # contents = self.processVoice('C', contents)
-        # contents = self.processVoice('D', contents)
-        # contents = self.processVoice('E', contents)
+        print content
 
-        file = open(output, "w")
-        file.write(contents)
-        file.close()
+        Util.writeFile(output, content)
 

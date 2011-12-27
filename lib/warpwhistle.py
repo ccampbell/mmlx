@@ -1,4 +1,4 @@
-import re, os
+import re, os, math
 from util import Util
 
 class WarpWhistle(object):
@@ -380,10 +380,14 @@ class WarpWhistle(object):
 
         content = '\n'.join(new_lines)
 
-        self.logger.log('replace unneccessary octave shifts', True)
-        content = content.replace('> <', '').replace('< >', '')
-        content = self.collapseSpaces(content, False)
 
+        self.logger.log('replace unneccessary octave shifts', True)
+        levels = math.ceil(abs(self.getGlobalVar(WarpWhistle.TRANSPOSE)) / 12)
+        for x in range(0, levels + 1):
+            content = self.collapseSpaces(content, False)
+            content = content.replace('> <', '').replace('< >', '')
+
+        content = self.collapseSpaces(content, False)
         return content
 
     def play(self):

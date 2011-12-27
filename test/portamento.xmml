@@ -5,10 +5,14 @@
 #X-ABSOLUTE-NOTES
 #X-TRANSPOSE 0
 
-AB t130
+AB t140
 
 @v0 = { 10 }
 @v1 = { 5 }
+
+; @flute {
+;     @v = { 0 1 2 3 4 5 6 7 8 9 10 10 10 10 9 8 7 6 6 5 4 }
+; }
 
 /*===========================
 Song :
@@ -23,10 +27,17 @@ A q4 l8SD1 c e- g e- c e- g e- c w1 SD2 c e- g e- c e- g e- c w1 SD3 c e- g e- c
 A l4 @v0 o4 @02 l4 q4 SD0 @vr1 [e e EN1 c ENOF g f+ f+ EN1 d ENOF a < b b EN1 g ENOF d b b EN0 e ENOF d]2 SDOF ; r4 q4 c d e d c SDOF
 C o4 [c c e8 e8 g8 g8 d d f+8 f+8 a8 a8 g g b8 b8 d8 d8 e e g8 g8 b8 b8]2*/
 
-A @@2 @v0 [a2,16 c3,16 e3,16 a3,16]4
-A         [f2,16 a2,16 c3,16 f3,16]4
-A         [c2,16 e2,16 g2,16 c3,16]4
-A         [e2,16 g+2,16 b2,16 e3,16]4
+/* CHORDS */
+a_minor = [a2,16 c3,16 e3,16 a3,16]4
+f_major = [f2,16 a2,16 c3,16 f3,16]4
+c_major = > [c2,16 e2,16 g2,16 c3,16]4
+e_major = [e2,16 g+2,16 b2,16 d3,16]4
+
+A @@2 @v0 q6 [a_minor f_major c_major e_major]2
+; B @@0 @v0 c5,2^4 g4 a4,2^4 c5,8 d5,8 e5,1
+
+; A @@2 @v0 q4 c3 c3 c3 c3 c4 c4 c4 c4
+; B @@2 @v0 q4 a2 a2 a2 a2 a2 a2 a2 a2
 
 ; B c c c c; EP1 d2 ENOF EP0 e2 EPOF EP1 f2 EPOF
 ; B l4 @v0 o3 @02 c2 g2 > c2

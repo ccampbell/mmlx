@@ -4,8 +4,8 @@ class WarpWhistle(object):
     TEMPO = 'tempo'
     VOLUME = 'volume'
     TIMBRE = 'timbre'
-    ABSOLUTE_NOTES = 'ABSOLUTE-NOTES'
-    TRANSPOSE = 'TRANSPOSE'
+    ABSOLUTE_NOTES = 'X-ABSOLUTE-NOTES'
+    TRANSPOSE = 'X-TRANSPOSE'
     OCTAVE = 'octave'
 
     def __init__(self, content, logger):
@@ -67,17 +67,78 @@ class WarpWhistle(object):
         pattern = '\s{2,}' if new_lines else ' {2,}'
         return re.sub(re.compile(pattern, re.MULTILINE), ' ', content)
 
-    def processVariables(self, content):
-        matches = re.findall(r'(^#X-([-A-Z]+)( {1,}(.*))?\n)', content, re.MULTILINE)
+    def processGlobalVariables(self, content):
+        matches = re.findall(r'(^#([-A-Z]+)( {1,}(.*))?\n)', content, re.MULTILINE)
         for match in matches:
             if match[1] == WarpWhistle.TRANSPOSE:
                 self.global_vars[match[1]] = int(match[3]) if match[3] else 0
             else:
                 self.global_vars[match[1]] = match[3] or True
 
+            if match[1].startswith('X-'):
+                content = content.replace(match[0], '')
+
+        return content
+
+    def isReserved(self, var):
+        # single letter match
+        if re.match(r'^[A-Z]{1,2}$', var):
+            return True
+
+        # volume macro
+        if re.match(r'^v\d+$', var):
+            return True
+
+        # rest
+        if re.match(r'^r\d+$', var):
+            return True
+
+        # wait
+        if re.match(r'^w\d+$', var):
+            return True
+
+        # pitch macro
+        if re.match(r'^EP\d+$', var):
+            return True
+
+        # arpeggio macro
+        if re.match(r'^EN\d+$', var):
+            return True
+
+        # self delay macro
+        if re.match(r'^SD\d+$', var):
+            return True
+
+        reserved = ['EPOF', 'ENOF', 'SDOF', 'w', 'r']
+
+        return var in reserved
+
+    def processLocalVariables(self, content):
+        matches = re.findall(r'(^([a-zA-Z]{1}([a-zA-Z0-9_]+)?)\s{0,}=\s{0,}(.*)\n)', content, re.MULTILINE)
+        for match in matches:
+
+            if self.isReserved(match[1]):
+                raise Exception('variable ' + match[1] + ' is reserved')
+
+            self.vars[match[1]] = match[3]
+
             content = content.replace(match[0], '')
 
         return content
+
+    def processVariables(self, content):
+        content = self.processGlobalVariables(content)
+        content = self.processLocalVariables(content)
+        return content
+
+    def replaceVariables(self, content):
+        for key in self.vars:
+            content = content.replace(key, self.vars[key])
+
+        return content
+
+    def isUndefinedVariable(self, var):
+        return False
 
     # def processVoice(self, voice, content):
     #     regex = '(' + voice + '\s{0,}(.*?)(?=(\n[A-Z^' + voice + ']{1,2}\s|\n?\Z)))'
@@ -194,7 +255,7 @@ class WarpWhistle(object):
 
         # rewrite special voices for xmml such as c4 or G+/4^8
         # to use this put the line X-ABSOLUTE-NOTES at the top of your xmml file
-        match = re.match(r'(\[)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})(,(\d+\.?)(\^[0-9\^]+)?)?(\]\d+)?', word)
+        match = re.match(r'(\[+)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})(,(\d+\.?)(\^[0-9\^]+)?)?([\]\d]+)?', word)
         if match and self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
 
             new_word = ""
@@ -211,8 +272,9 @@ class WarpWhistle(object):
             self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, int(octave))
             current_octave = int(octave)
 
+            # [[[
             if match.group(1):
-                new_word += '['
+                new_word += match.group(1)
 
             note = ""
 
@@ -242,9 +304,8 @@ class WarpWhistle(object):
             return new_word
 
         # regular note
-        match = re.match(r'(\[)?([a-g]{1}(\+|\-)?)(.*)(\]\d+)?', word)
+        match = re.match(r'(\[+)?([a-g]{1}(\+|\-)?)([\.0-9\^]+)([\]\d]+)?', word)
         if match:
-
             if "," in word and not self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
                 raise Exception('In order to use absolute notes you have to specify X-ABSOLUTE-NOTES')
 
@@ -258,8 +319,9 @@ class WarpWhistle(object):
 
             return new_note
 
-
-        print "PROCESS:",word
+        if self.isUndefinedVariable(word):
+            raise Exception('variable ' + word + ' is undefined')
+        # print "PROCESS:",word
         # print "PREV:",prev_word
         # print "NEXT:",next_word
         # print ""
@@ -289,6 +351,9 @@ class WarpWhistle(object):
 
         self.logger.log('parsing variables', True)
         content = self.processVariables(content)
+
+        self.logger.log('applying variables', True)
+        content = self.replaceVariables(content)
 
         self.logger.log('collapsing spaces', True)
         content = self.collapseSpaces(content)

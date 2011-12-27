@@ -25,8 +25,12 @@ class Listener(object):
             files = self.getFilesFromDir(start, "xmml")
             for file in files:
                 filename = os.path.basename(file)
+
+                if filename.startswith('_'):
+                    continue
+
                 last_changed = os.stat(file).st_mtime
-                output_file = end + "/" + filename.replace(".xmml", ".mml")
+                output_file = os.path.join(end, filename.replace(".xmml", ".mml"))
 
                 if not self.file_list.has_key(file):
                     self.file_list[file] = last_changed

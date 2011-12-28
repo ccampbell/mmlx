@@ -23,23 +23,28 @@ class Listener(object):
         while 1:
             if is_dir:
                 files = self.getFilesFromDir(start, "xmml")
-                for file in files:
-                    filename = os.path.basename(file)
+                output_file = None
+            else:
+                files = [start]
+                output_file = end
 
-                    if filename.startswith('_'):
-                        continue
+            for file in files:
+                filename = os.path.basename(file)
 
-                    last_changed = os.stat(file).st_mtime
-                    output_file = os.path.join(end, filename.replace(".xmml", ".mml"))
+                if filename.startswith('_'):
+                    continue
 
-                    if not self.file_list.has_key(file):
-                        self.file_list[file] = last_changed
-                        self.callback(file, output_file)
-                        continue
+                last_changed = os.stat(file).st_mtime
+                output_file = output_file if output_file is not None else os.path.join(end, filename.replace(".xmml", ".mml"))
 
-                    if last_changed != self.file_list[file]:
-                        self.logger.log("detected change to: " + file)
-                        self.file_list[file] = last_changed
-                        self.callback(file, output_file)
+                if not self.file_list.has_key(file):
+                    self.file_list[file] = last_changed
+                    self.callback(file, output_file)
+                    continue
+
+                if last_changed != self.file_list[file]:
+                    self.logger.log("detected change to: " + file)
+                    self.file_list[file] = last_changed
+                    self.callback(file, output_file)
 
             time.sleep(.5)

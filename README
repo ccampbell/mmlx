@@ -6,5 +6,5 @@ XMML allows you to:
 - use portamento to slide from note to note
 - store data such as chords or patterns in variables
 - transpose to any key
-- target notes directly without having to worry about jumping up and down octaves
+- target notes directly without having to jump up and down octaves
 - generate random sounds

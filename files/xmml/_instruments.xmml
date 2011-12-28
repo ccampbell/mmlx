@@ -1,0 +1,27 @@
+/**
+ * drums
+ */
+hi-hat:
+    q: 1
+    volume: 11 9 7 5 3
+
+snare:
+    volume: 15 7 7 7 6 6 5 5 0
+    pitch: -20 | 0 2 0
+    q: 4
+
+snare-soft:
+    @extends "snare"
+    volume: 8 7 0
+
+snare-softer:
+    @extends "snare-soft"
+    volume: 3 2 0
+
+/**
+ * synths
+ */
+square-short:
+    volume: 10
+    timbre: 2
+    q: 4

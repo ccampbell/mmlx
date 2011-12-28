@@ -259,6 +259,9 @@ class WarpWhistle(object):
         return self.current_voices[0] == 'D'
 
     def transposeNote(self, note, octave, amount, append):
+        if append is None:
+            append = ''
+
         if amount == 0 or self.isNoiseChannel():
             return note + append
 
@@ -382,7 +385,7 @@ class WarpWhistle(object):
             return new_word
 
         # regular note
-        match = re.match(r'(\[+)?([a-g]{1}(\+|\-)?)([\.0-9\^]+)([\]\d]+)?', word)
+        match = re.match(r'(\[+)?([a-g]{1}(\+|\-)?)([\.0-9\^]+)?([\]\d]+)?', word)
         if match:
             if "," in word and not self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
                 raise Exception('In order to use absolute notes you have to specify X-ABSOLUTE-NOTES')
@@ -448,6 +451,9 @@ class WarpWhistle(object):
 
         self.logger.log('proccessing imports', True)
         content = self.processImports(content)
+
+        self.logger.log('stripping comments', True)
+        content = self.stripComments(content)
 
         self.logger.log('parsing instruments', True)
         content = self.processInstruments(content)

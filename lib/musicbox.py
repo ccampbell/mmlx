@@ -17,8 +17,6 @@ class MusicBox(object):
         whistle.import_directory = os.path.dirname(input)
         content = whistle.play()
 
-        # print content
-
         self.logger.log('saving file as ' + output)
         Util.writeFile(output, content)
 

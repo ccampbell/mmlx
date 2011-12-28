@@ -2,6 +2,7 @@ XMML is short for eXtended MML.  It allows you to do things that you cannot do u
 
 XMML allows you to:
 - define and use instrument patches
+- import other xmml files or instruments into your current file
 - use portamento to slide from note to note
 - store data such as chords or patterns in variables
 - transpose to any key

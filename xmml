@@ -29,6 +29,7 @@ except:
 
 verbose = False
 start = None
+listen = False
 file_list = {}
 for key, value in opts:
     if key == "--help":
@@ -36,6 +37,7 @@ for key, value in opts:
     elif key == "--verbose":
         verbose = True
     elif key == "--watch":
+        listen = True
         bits = value.split(':')
         start = bits[0]
         if len(bits) == 1:
@@ -44,11 +46,18 @@ for key, value in opts:
 
         end = bits[1]
 
+def isFileOrDirectory(path):
+    return os.path.isfile(path) or os.path.isdir(path)
+
+if len(args) >= 2 and isFileOrDirectory(args[0]) and isFileOrDirectory(args[1]):
+    start = args[0]
+    end = args[1]
+
 if start is None:
     print "file or directory to watch is required"
     showUsage()
 
-if not os.path.isfile(start) and not os.path.isdir(start):
+if not isFileOrDirectory(start):
     print start,"is not a file or directory"
     showUsage()
 
@@ -57,7 +66,10 @@ logger = Logger(verbose)
 listener = Listener(logger)
 musicbox = MusicBox(logger)
 listener.onChange(musicbox.processFile)
-listener.watch(start, end)
+if listen:
+    listener.watch(start, end)
+else:
+    listener.process(start, end)
 # except:
     # sys.exit(1)
     # pass

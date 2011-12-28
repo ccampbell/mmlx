@@ -6,12 +6,9 @@
  * XMML Variables
  */
 #X-ABSOLUTE-NOTES
-#X-TRANSPOSE 0
+#X-TRANSPOSE -1
 
-ABCDE t130
-
-@v0 = { 10 }
-@v1 = { 5 }
+ABCDE t135
 
 /*
  * Instruments
@@ -28,6 +25,11 @@ snare-soft:
 snare-softer:
     @extends "snare-soft"
     volume: 3 2 0
+
+square-short:
+    volume: 10
+    timbre: 2
+    q: 3
 
 /*===========================
 Song :
@@ -46,9 +48,9 @@ C o4 [c c e8 e8 g8 g8 d d f+8 f+8 a8 a8 g g b8 b8 d8 d8 e e g8 g8 b8 b8]2*/
  * Chords
  */
 @import "_chords"
-verse_beat = @snare-softer [c,16]4 @snare c16 @snare-softer [c16]3
+verse_beat = @snare-softer [c16]4 @snare c16 @snare-softer [c16]3
 
-A @2 @v0 q6 a_minor f_major c_major e_major ; a b c d e f g+ a
+A @square-short [a_minor f_major c_major e_major]2
 ; C a3,1 f3,1 c4,1 e3 e3 b3 g+3
 D [verse_beat]16
 ; B @@0 @v0 c5,2^4 g4 a4,2^4 c5,8 d5,8 e5,1

@@ -8,3 +8,10 @@ XMML allows you to:
 - transpose to any key
 - target notes directly without having to jump up and down octaves
 - generate random sounds
+
+To-Do
+- Throw proper warnings/errors/syntax checks when code is not valid xmml
+- Add documentation
+- Add unit tests
+- Support ADSR?
+- Portamento

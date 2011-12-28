@@ -74,7 +74,10 @@ class WarpWhistle(object):
         content = re.sub(re.compile(r'(/\*(.*?)\*/)', re.MULTILINE | re.DOTALL), '', content)
 
         # replace all ; comments
-        content = re.sub(re.compile(r'(;.*)$', re.MULTILINE), '', content)
+        content = re.sub(re.compile(r' {0,}(;.*)$', re.MULTILINE), '', content)
+
+        # replace all // comments
+        content = re.sub(re.compile(r' {0,}(//.*)$', re.MULTILINE), '', content)
 
         # replace empty lines
         content = re.sub(re.compile(r'\n{2,}', re.MULTILINE), '\n', content)
@@ -176,7 +179,7 @@ class WarpWhistle(object):
                 instrument.inherit(self.instruments[instrument.getParent()])
 
     def processInstruments(self, content):
-        matches = re.findall(r'(^([a-zA-Z0-9-_]+):((\n( {4}|\t)(.*))+)\n)', content, re.MULTILINE)
+        matches = re.findall(r'(^([a-zA-Z0-9-_]+):( {0,}(\n( {4}|\t)(.*))+)\n)', content, re.MULTILINE)
         for match in matches:
             self.addInstrument(match[1], match[2])
             content = content.replace(match[0], '')

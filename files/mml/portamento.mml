@@ -1,11 +1,11 @@
 #TITLE Portamento Test
 #COMPOSER Craig Campbell
 #PROGRAMER Craig Campbell
-@v100 = { 3 2 0 }
-@v101 = { 14 6 6 6 5 5 4 4 0 }
+@100 = { 2 }
+@v100 = { 10 }
+@v101 = { 3 2 0 }
+@v102 = { 14 6 6 6 5 5 4 4 0 }
 @EP100 = { -20 | 0 2 0 }
-ABCDE t130
-@v0 = { 10 }
-@v1 = { 5 }
-A @2 @v0 q6 o2 [a16 > c16 e16 a16]4 < [f16 a16 > c16 f16]4 < [c16 e16 g16 > c16]4 < [e16 g+16 b16 > d16]4 
-D [@v100 EP100 q4 [c16]4 EPOF @v101 EP100 q4 c16 EPOF @v100 EP100 q4 [c16]3]16
+ABCDE t135
+A @@100 @v100 q3 o2 [[g+16 b16 > d+16 g+16]4 < [e16 g+16 b16 > e16]4 < [< b16 > d+16 f+16 b16]4 [d+16 g16 a+16 > c+16]4]2
+D [@v101 EP100 q4 [c16]4 EPOF @v102 EP100 q4 c16 EPOF @v101 EP100 q4 [c16]3]16

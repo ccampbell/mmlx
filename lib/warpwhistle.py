@@ -1,21 +1,28 @@
 import re, os, math
 from util import Util
+from instrument import Instrument
 
 class WarpWhistle(object):
     TEMPO = 'tempo'
     VOLUME = 'volume'
     TIMBRE = 'timbre'
+    INSTRUMENT = 'instrument'
+    OCTAVE = 'octave'
     ABSOLUTE_NOTES = 'X-ABSOLUTE-NOTES'
     TRANSPOSE = 'X-TRANSPOSE'
-    OCTAVE = 'octave'
 
     def __init__(self, content, logger):
         self.content = content
         self.logger = logger
+        self.reset()
+
+    def reset(self):
         self.current_voices = []
         self.global_vars = {}
         self.vars = {}
+        self.instruments = {}
         self.data = {}
+        self.global_lines = []
 
     def getDataForVoice(self, voice, key):
         if not voice in self.data:
@@ -74,10 +81,12 @@ class WarpWhistle(object):
 
         return content
 
-    def collapseSpaces(self, content, new_lines = True):
+    def collapseSpaces(self, content):
         # collapse multiple spaces into a single space
-        pattern = '\s{2,}' if new_lines else ' {2,}'
-        return re.sub(re.compile(pattern, re.MULTILINE), ' ', content)
+        return re.sub(re.compile(' {2,}', re.MULTILINE), ' ', content)
+
+    def removeBlankLines(self, content):
+        return re.sub(r'\n{2,}', '\n', content)
 
     def processGlobalVariables(self, content):
         matches = re.findall(r'(^#([-A-Z]+)( {1,}(.*))?\n)', content, re.MULTILINE)
@@ -89,6 +98,8 @@ class WarpWhistle(object):
 
             if match[1].startswith('X-'):
                 content = content.replace(match[0], '')
+            else:
+                self.global_lines.append(match[0])
 
         return content
 
@@ -142,6 +153,44 @@ class WarpWhistle(object):
         content = self.processGlobalVariables(content)
         content = self.processLocalVariables(content)
         return content
+
+    def addInstrument(self, name, content):
+        lines = content.strip().split('\n')
+        data = {}
+
+        for line in lines:
+            line = line.strip()
+            match = re.match(r'^@extends {1,}(\'|\")(.*)(\1)$', line)
+            if match:
+                data["extends"] = match.group(2)
+                continue
+
+            data[line.split(':')[0].strip()] = line.split(':')[1].strip()
+
+        self.instruments[name] = Instrument(data)
+
+    def updateInstruments(self):
+        for name in self.instruments:
+            instrument = self.instruments[name]
+            while instrument.hasParent():
+                instrument.inherit(self.instruments[instrument.getParent()])
+
+    def processInstruments(self, content):
+        matches = re.findall(r'(^([a-zA-Z0-9-_]+):((\n( {4}|\t)(.*))+)\n)', content, re.MULTILINE)
+        for match in matches:
+            self.addInstrument(match[1], match[2])
+            content = content.replace(match[0], '')
+
+        self.updateInstruments()
+        return content
+
+    def renderInstruments(self, content):
+        if not Instrument.hasBeenUsed():
+            return content
+
+        # find the last #BLOCK on the top of the file and render the instruments below it
+        last_global_declaration = self.global_lines[-1]
+        return content.replace(last_global_declaration, last_global_declaration + Instrument.render())
 
     def replaceVariables(self, content):
         for key in self.vars:
@@ -203,12 +252,16 @@ class WarpWhistle(object):
             11: 'b'
         }
 
+    def isNoiseChannel(self):
+        return self.current_voices[0] == 'D'
+
     def transposeNote(self, note, octave, amount, append):
-        if amount == 0:
+        if amount == 0 or self.isNoiseChannel():
             return note + append
 
         new_note_number = self.getNumberForNote()[note] + amount
         new_note = ""
+
 
         ticks = 0
         while new_note_number < 0:
@@ -252,6 +305,11 @@ class WarpWhistle(object):
             self.setDataForVoices(self.current_voices, WarpWhistle.TIMBRE, int(word[2:]))
             return word
 
+        # direct timbre
+        if re.match(r'@\d+$', word):
+            self.setDataForVoices(self.current_voices, WarpWhistle.TIMBRE, int(word[1:]))
+            return word
+
         # explicit octave change (with o4 o3 etc)
         if re.match(r'o\d+$', word):
             self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, int(word[1:]))
@@ -267,22 +325,27 @@ class WarpWhistle(object):
 
         # rewrite special voices for xmml such as c4 or G+/4^8
         # to use this put the line X-ABSOLUTE-NOTES at the top of your xmml file
-        match = re.match(r'(\[+)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})(,(\d+\.?)(\^[0-9\^]+)?)?([\]\d]+)?', word)
+        match = re.match(r'(\[+)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})?(,(\d+\.?)(\^[0-9\^]+)?)?([\]\d]+)?$', word)
         if match and self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
+            is_noise_channel = self.current_voices[0] == 'D'
+
+            if is_noise_channel and not "," in word:
+                return word
 
             new_word = ""
 
-            octave = match.group(4)
+            octave = match.group(4) if not is_noise_channel else 0
 
             current_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
 
-            if current_octave is None:
+            if current_octave is None and not is_noise_channel:
                 new_word += 'o' + octave + ' '
-            elif int(octave) != current_octave:
+            elif not is_noise_channel and octave and int(octave) != current_octave:
                 new_word += self.moveToOctave(int(octave), current_octave) + ' '
 
-            self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, int(octave))
-            current_octave = int(octave)
+            if octave:
+                self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, int(octave))
+                current_octave = int(octave)
 
             # [[[
             if match.group(1):
@@ -331,8 +394,27 @@ class WarpWhistle(object):
 
             return new_note
 
+        match = re.match(r'^(\[+)?@([a-zA-Z0-9-_]+)$', word)
+        if match:
+            new_instrument = self.instruments[match.group(2)]
+            active_instrument = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
+            self.setDataForVoices(self.current_voices, WarpWhistle.INSTRUMENT, new_instrument)
+
+            new_word = ''
+
+            if match.group(1):
+                new_word += match.group(1)
+
+            if active_instrument:
+                new_word += active_instrument.end()
+
+            new_word += new_instrument.start()
+
+            return new_word
+
         if self.isUndefinedVariable(word):
             raise Exception('variable ' + word + ' is undefined')
+
         # print "PROCESS:",word
         # print "PREV:",prev_word
         # print "NEXT:",next_word
@@ -358,11 +440,14 @@ class WarpWhistle(object):
         return ' '.join(new_words)
 
     def process(self, content):
+        self.logger.log('stripping comments', True)
+        content = self.stripComments(content)
+
         self.logger.log('proccessing imports', True)
         content = self.processImports(content)
 
-        self.logger.log('stripping comments', True)
-        content = self.stripComments(content)
+        self.logger.log('parsing instruments', True)
+        content = self.processInstruments(content)
 
         self.logger.log('parsing variables', True)
         content = self.processVariables(content)
@@ -380,14 +465,19 @@ class WarpWhistle(object):
 
         content = '\n'.join(new_lines)
 
+        content = self.renderInstruments(content)
 
         self.logger.log('replace unneccessary octave shifts', True)
         levels = math.ceil(abs(self.getGlobalVar(WarpWhistle.TRANSPOSE)) / 12)
-        for x in range(0, levels + 1):
-            content = self.collapseSpaces(content, False)
+        for x in range(0, int(levels + 1)):
+            content = self.collapseSpaces(content)
             content = content.replace('> <', '').replace('< >', '')
 
-        content = self.collapseSpaces(content, False)
+        content = self.collapseSpaces(content)
+
+        self.logger.log('removing blank lines', True)
+        content = self.removeBlankLines(content)
+
         return content
 
     def play(self):

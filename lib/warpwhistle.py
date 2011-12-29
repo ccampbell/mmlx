@@ -8,6 +8,7 @@ class WarpWhistle(object):
     TIMBRE = 'timbre'
     INSTRUMENT = 'instrument'
     OCTAVE = 'octave'
+    SLIDE = 'slide'
     ABSOLUTE_NOTES = 'X-ABSOLUTE-NOTES'
     TRANSPOSE = 'X-TRANSPOSE'
 
@@ -258,16 +259,112 @@ class WarpWhistle(object):
     def isNoiseChannel(self):
         return self.current_voices[0] == 'D'
 
+    def getFrequency(self, note, octave):
+        frequencies = [
+            0x06AE,
+            0x064E,
+            0x05F4,
+            0x059E,
+            0x054E,
+            0x0501,
+            0x04B9,
+            0x0476,
+            0x0436,
+            0x03F9,
+            0x03C0,
+            0x038A
+        ]
+
+        index = self.getNumberForNote()[note]
+        frequency = frequencies[index] >> (octave - 2)
+        return frequency
+
+    def slide(self, start_data, end_data):
+        if start_data is None:
+            return end_data['note'] + end_data['append']
+
+        match = re.match(r'^([a-g](\+|\-)?)(.*)$', start_data['note'])
+        start_data['note'] = match.group(1)
+        start_data['append'] = match.group(3)
+
+        # total amount we need to move
+        slide_amount = self.getFrequency(start_data['note'], start_data['octave']) - self.getFrequency(end_data['note'], end_data['octave'])
+
+        # song tempo
+        tempo = self.getDataForVoice(self.current_voices[0], WarpWhistle.TEMPO)
+
+        # @todo this is NTSC, need to add support for PAL - 50 FPS
+        frames_per_second = 60
+
+        # default to 16th note unless speed is specified
+        slide_note_duration = 16 if start_data['speed'] is None else start_data['speed']
+
+        # figure out the slide duration in seconds
+        beats_per_second = float(tempo) / float(60)
+        slides_per_second = (float(slide_note_duration) / float(4)) * beats_per_second
+        slide_duration = float(1) / float(slides_per_second)
+
+        frames_for_slide = int(math.floor(frames_per_second * slide_duration))
+
+        steps = frames_for_slide
+        distance_per_step = int(math.floor(slide_amount / frames_for_slide))
+        remainder = slide_amount - steps * distance_per_step
+
+        # print 'STEPS',steps
+        # print 'DISTANCE_PER_STEP',distance_per_step
+        # print 'REMAINDER',remainder
+
+        increase_at = steps - remainder
+        pitch_macro = []
+        for x in range(0, steps):
+            if x < increase_at:
+                pitch_macro.append(str(distance_per_step))
+                continue
+
+            pitch_macro.append(str(distance_per_step + 1))
+
+        pitch_macro = ' '.join(pitch_macro) + ' 0'
+        instrument = Instrument({
+            'pitch': pitch_macro
+        })
+
+        macro = instrument.getPitchMacro()
+
+        # no longer need to slide
+        self.setDataForVoices(self.current_voices, WarpWhistle.SLIDE, None)
+
+        append_before = end_data['append']
+        append_after =''
+        match = re.match(r'(.*)(\](.*))', end_data['append'])
+        if match:
+
+            if match.group(1):
+                append_before = match.group(1)
+
+            if match.group(2):
+                append_after = match.group(2)
+
+        # print 'START',start_data
+        # print 'END',end_data
+        # print ""
+
+        return self.getOctaveShift(start_data['octave'] - end_data['octave']) + ' ' + macro + ' ' + start_data['note'] + append_before + ' EPOF' + append_after
+
+    def getOctaveShift(self, ticks):
+        char = '<' if ticks < 0 else '>'
+        return abs(ticks) * char
+
     def transposeNote(self, note, octave, amount, append):
         if append is None:
             append = ''
 
+        start_data = self.getDataForVoice(self.current_voices[0], WarpWhistle.SLIDE)
+
+        new_note = ''
         if amount == 0 or self.isNoiseChannel():
-            return note + append
+            return self.slide(start_data, {'note': note, 'append': append, 'octave': octave})
 
         new_note_number = self.getNumberForNote()[note] + amount
-        new_note = ""
-
 
         ticks = 0
         while new_note_number < 0:
@@ -282,8 +379,7 @@ class WarpWhistle(object):
 
         new_note += self.getNoteForNumber()[new_note_number]
 
-        char = '<' if ticks < 0 else '>'
-        new_note += append + ' ' + abs(ticks) * char
+        new_note += append + ' ' + self.getOctaveShift(ticks)
 
         return new_note
 
@@ -291,8 +387,16 @@ class WarpWhistle(object):
         if not word:
             return word
 
+        # slides for portamento
+        match = re.match(r'^\/([0-9]+)?$', word)
+        if match:
+            prev_note = self.processWord(prev_word, None, None)
+            prev_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
+            self.setDataForVoices(self.current_voices, WarpWhistle.SLIDE, {'note': prev_note, 'octave': prev_octave, 'speed': match.group(1)})
+            return ''
+
         # matches a voice declaration
-        if re.match(r'[A-Z]{1,2}$', word):
+        if re.match(r'[A-Z]{1,}$', word):
             self.current_voices = list(word)
             return word
 
@@ -385,7 +489,7 @@ class WarpWhistle(object):
             return new_word
 
         # regular note
-        match = re.match(r'(\[+)?([a-g]{1}(\+|\-)?)([\.0-9\^]+)?([\]\d]+)?', word)
+        match = re.match(r'(\[+)?([a-g]{1}(\+|\-)?)([\.0-9\^]+)?([\]\d+]+)?', word)
         if match:
             if "," in word and not self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
                 raise Exception('In order to use absolute notes you have to specify X-ABSOLUTE-NOTES')
@@ -396,10 +500,18 @@ class WarpWhistle(object):
             if match.group(1):
                 new_note += match.group(1)
 
-            new_note += self.transposeNote(match.group(2), current_octave, self.getGlobalVar(WarpWhistle.TRANSPOSE), match.group(4))
+            append = ''
+            if match.group(4):
+                append = match.group(4)
+
+            if match.group(5):
+                append += match.group(5)
+
+            new_note += self.transposeNote(match.group(2), current_octave, self.getGlobalVar(WarpWhistle.TRANSPOSE), append)
 
             return new_note
 
+        # instrument
         match = re.match(r'^(\[+)?@([a-zA-Z0-9-_]+)$', word)
         if match:
             new_instrument = self.instruments[match.group(2)]
@@ -477,8 +589,8 @@ class WarpWhistle(object):
         content = self.renderInstruments(content)
 
         self.logger.log('replace unneccessary octave shifts', True)
-        levels = math.ceil(abs(self.getGlobalVar(WarpWhistle.TRANSPOSE)) / 12)
-        for x in range(0, int(levels + 1)):
+        levels = math.ceil(abs(float(self.getGlobalVar(WarpWhistle.TRANSPOSE))) / float(12))
+        for x in range(0, int(levels) + 1):
             content = self.collapseSpaces(content)
             content = content.replace('> <', '').replace('< >', '')
 

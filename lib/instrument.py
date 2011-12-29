@@ -102,37 +102,70 @@ class Instrument(object):
 
         return macros
 
-    def start(self):
+    def start(self, whistle):
         start = ''
         if hasattr(self, 'timbre'):
-            start += self.getTimbreMacro() + ' '
+            last_timbre = whistle.getDataForVoice(whistle.current_voices[0], 'timbre')
+            new_timbre = self.getTimbreMacro()
+
+            if new_timbre != last_timbre:
+                whistle.setDataForVoices(whistle.current_voices, 'timbre', new_timbre)
+                start += new_timbre + ' '
 
         if hasattr(self, 'volume'):
-            start += self.getVolumeMacro() + ' '
+            last_volume = whistle.getDataForVoice(whistle.current_voices[0], 'volume')
+            new_volume = self.getVolumeMacro()
+
+            if new_volume != last_volume:
+                whistle.setDataForVoices(whistle.current_voices, 'volume', new_volume)
+                start += new_volume + ' '
 
         if hasattr(self, 'pitch'):
-            start += self.getPitchMacro() + ' '
+            last_pitch = whistle.getDataForVoice(whistle.current_voices[0], 'pitch')
+            new_pitch = self.getPitchMacro()
+
+            if new_pitch != last_pitch:
+                whistle.setDataForVoices(whistle.current_voices, 'pitch', new_pitch)
+                start += new_pitch + ' '
 
         if hasattr(self, 'arpeggio'):
-            start += self.getArpeggioMacro() + ' '
+            last_arpeggio = whistle.getDataForVoice(whistle.current_voices[0], 'arpeggio')
+            new_arpeggio = self.getArpeggioMacro()
+
+            if new_arpeggio != last_arpeggio:
+                whistle.setDataForVoices(whistle.current_voices, 'arpeggio', new_arpeggio)
+                start += new_arpeggio + ' '
 
         if hasattr(self, 'vibrato'):
-            start += self.getVibratoMacro() + ' '
+            last_vibrato = whistle.getDataForVoice(whistle.current_voices[0], 'vibrato')
+            new_vibrato = self.getVibratoMacro()
+
+            if new_vibrato != last_vibrato:
+                whistle.setDataForVoices(whistle.current_voices, 'vibrato', new_vibrato)
+                start += new_vibrato + ' '
 
         if hasattr(self, 'q'):
-            start += 'q' + self.q + ' '
+            last_q = whistle.getDataForVoice(whistle.current_voices[0], 'q')
+            new_q = 'q' + self.q
+
+            if new_q != last_q:
+                whistle.setDataForVoices(whistle.current_voices, 'q', new_q)
+                start += new_q + ' '
 
         return start
 
-    def end(self):
+    def end(self, whistle):
         end = ''
         if hasattr(self, 'pitch'):
+            whistle.setDataForVoices(whistle.current_voices, 'pitch', None)
             end += 'EPOF '
 
         if hasattr(self, 'arpeggio'):
+            whistle.setDataForVoices(whistle.current_voices, 'arpeggio', None)
             end += 'ENOF '
 
         if hasattr(self, 'vibrato'):
+            whistle.setDataForVoices(whistle.current_voices, 'vibrato', None)
             end += 'MPOF '
 
         return end

@@ -6,9 +6,12 @@ class WarpWhistle(object):
     TEMPO = 'tempo'
     VOLUME = 'volume'
     TIMBRE = 'timbre'
+    ARPEGGIO = 'arpeggio'
     INSTRUMENT = 'instrument'
+    PITCH = 'pitch'
     OCTAVE = 'octave'
     SLIDE = 'slide'
+    Q = 'q'
     ABSOLUTE_NOTES = 'X-ABSOLUTE-NOTES'
     TRANSPOSE = 'X-TRANSPOSE'
 
@@ -280,9 +283,9 @@ class WarpWhistle(object):
         return frequency
 
     def slide(self, start_data, end_data):
-        match = re.match(r'^([a-g](\+|\-)?)(.*)$', start_data['note'])
-        start_data['note'] = match.group(1)
-        start_data['append'] = match.group(3)
+        match = re.match(r'^(\[+)?([a-g](\+|\-)?)(.*)$', start_data['note'])
+        start_data['note'] = match.group(2)
+        start_data['append'] = match.group(4)
 
         # total amount we need to move
         slide_amount = self.getFrequency(start_data['note'], start_data['octave']) - self.getFrequency(end_data['note'], end_data['octave'])
@@ -341,9 +344,9 @@ class WarpWhistle(object):
             if match.group(2):
                 append_after = match.group(2)
 
-        print 'START',start_data
-        print 'END',end_data
-        print ""
+        # print 'START',start_data
+        # print 'END',end_data
+        # print ""
 
         octave_diff = start_data['octave'] - end_data['octave']
 
@@ -423,6 +426,21 @@ class WarpWhistle(object):
             self.setDataForVoices(self.current_voices, WarpWhistle.TIMBRE, int(word[2:]))
             return word
 
+        # arpeggio change
+        if re.match(r'EN\d+$', word):
+            self.setDataForVoices(self.current_voices, WarpWhistle.ARPEGGIO, int(word[2:]))
+            return word
+
+        # pitch change
+        if re.match(r'EP\d+$', word):
+            self.setDataForVoices(self.current_voices, WarpWhistle.PITCH, int(word[2:]))
+            return word
+
+        # q change
+        if re.match(r'q[0-8]+$', word):
+            self.setDataForVoices(self.current_voices, WarpWhistle.Q, int(word[1:]))
+            return word
+
         # direct timbre
         if re.match(r'@\d+$', word):
             self.setDataForVoices(self.current_voices, WarpWhistle.TIMBRE, int(word[1:]))
@@ -438,6 +456,10 @@ class WarpWhistle(object):
             direction = word[0]
             count = len(word)
             current_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
+
+            if current_octave is None:
+                current_octave = 0
+
             self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, current_octave + (count if direction == '>' else -count))
 
             return word
@@ -523,6 +545,9 @@ class WarpWhistle(object):
         # instrument
         match = re.match(r'^(\[+)?@([a-zA-Z0-9-_]+)$', word)
         if match:
+            if not match.group(2) in self.instruments:
+                return word
+
             new_instrument = self.instruments[match.group(2)]
             active_instrument = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
             self.setDataForVoices(self.current_voices, WarpWhistle.INSTRUMENT, new_instrument)
@@ -533,9 +558,9 @@ class WarpWhistle(object):
                 new_word += match.group(1)
 
             if active_instrument:
-                new_word += active_instrument.end()
+                new_word += active_instrument.end(self)
 
-            new_word += new_instrument.start()
+            new_word += new_instrument.start(self)
 
             return new_word
 

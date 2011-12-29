@@ -280,9 +280,6 @@ class WarpWhistle(object):
         return frequency
 
     def slide(self, start_data, end_data):
-        if start_data is None:
-            return end_data['note'] + end_data['append']
-
         match = re.match(r'^([a-g](\+|\-)?)(.*)$', start_data['note'])
         start_data['note'] = match.group(1)
         start_data['append'] = match.group(3)
@@ -344,9 +341,9 @@ class WarpWhistle(object):
             if match.group(2):
                 append_after = match.group(2)
 
-        # print 'START',start_data
-        # print 'END',end_data
-        # print ""
+        print 'START',start_data
+        print 'END',end_data
+        print ""
 
         return self.getOctaveShift(start_data['octave'] - end_data['octave']) + ' ' + macro + ' ' + start_data['note'] + append_before + ' EPOF' + append_after
 
@@ -362,7 +359,10 @@ class WarpWhistle(object):
 
         new_note = ''
         if amount == 0 or self.isNoiseChannel():
-            return self.slide(start_data, {'note': note, 'append': append, 'octave': octave})
+            if start_data:
+                return self.slide(start_data, {'note': note, 'append': append, 'octave': octave})
+
+            return note + append
 
         new_note_number = self.getNumberForNote()[note] + amount
 
@@ -377,9 +377,12 @@ class WarpWhistle(object):
             new_note += '> '
             new_note_number = new_note_number - 12
 
-        new_note += self.getNoteForNumber()[new_note_number]
-
+        note_name = self.getNoteForNumber()[new_note_number]
+        new_note += note_name
         new_note += append + ' ' + self.getOctaveShift(ticks)
+
+        # if start_data:
+            # return self.slide(start_data, {'note': note_name, 'append': append, 'octave': octave}) + self.getOctaveShift(ticks)
 
         return new_note
 
@@ -390,7 +393,7 @@ class WarpWhistle(object):
         # slides for portamento
         match = re.match(r'^\/([0-9]+)?$', word)
         if match:
-            prev_note = self.processWord(prev_word, None, None)
+            prev_note = self.processWord(prev_word, None, None).replace('<', '').replace('>', '').strip()
             prev_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
             self.setDataForVoices(self.current_voices, WarpWhistle.SLIDE, {'note': prev_note, 'octave': prev_octave, 'speed': match.group(1)})
             return ''

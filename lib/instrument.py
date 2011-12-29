@@ -9,11 +9,11 @@ class Instrument(object):
     @staticmethod
     def reset():
         Instrument.counters = {
-            'timbre': 100,
-            'volume': 100,
-            'pitch': 100,
-            'arpeggio': 100,
-            'vibrato': 100
+            'timbre': 20,
+            'volume': 20,
+            'pitch': 20,
+            'arpeggio': 20,
+            'vibrato': 20
         }
 
         Instrument.timbres = {}

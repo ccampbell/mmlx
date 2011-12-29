@@ -345,7 +345,9 @@ class WarpWhistle(object):
         print 'END',end_data
         print ""
 
-        return self.getOctaveShift(start_data['octave'] - end_data['octave']) + ' ' + macro + ' ' + start_data['note'] + append_before + ' EPOF' + append_after
+        octave_diff = start_data['octave'] - end_data['octave']
+
+        return self.getOctaveShift(octave_diff) + ' ' + macro + ' ' + start_data['note'] + append_before + ' EPOF' + append_after + ' ' + self.getOctaveShift(-octave_diff)
 
     def getOctaveShift(self, ticks):
         char = '<' if ticks < 0 else '>'
@@ -381,9 +383,6 @@ class WarpWhistle(object):
         new_note += note_name
         new_note += append + ' ' + self.getOctaveShift(ticks)
 
-        # if start_data:
-            # return self.slide(start_data, {'note': note_name, 'append': append, 'octave': octave}) + self.getOctaveShift(ticks)
-
         return new_note
 
     def processWord(self, word, next_word, prev_word):
@@ -393,9 +392,15 @@ class WarpWhistle(object):
         # slides for portamento
         match = re.match(r'^\/([0-9]+)?$', word)
         if match:
-            prev_note = self.processWord(prev_word, None, None).replace('<', '').replace('>', '').strip()
-            prev_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
-            self.setDataForVoices(self.current_voices, WarpWhistle.SLIDE, {'note': prev_note, 'octave': prev_octave, 'speed': match.group(1)})
+
+            # calculate the previous note
+            prev_note = self.processWord(prev_word, None, None)
+
+            # figure out what octave we are at now
+            start_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
+
+            self.setDataForVoices(self.current_voices, WarpWhistle.SLIDE, {'note': prev_note, 'octave': start_octave, 'speed': match.group(1)})
+
             return ''
 
         # matches a voice declaration
@@ -434,6 +439,7 @@ class WarpWhistle(object):
             count = len(word)
             current_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
             self.setDataForVoices(self.current_voices, WarpWhistle.OCTAVE, current_octave + (count if direction == '>' else -count))
+
             return word
 
         # rewrite special voices for xmml such as c4 or G+/4^8

@@ -1,10 +1,66 @@
 from util import Util
+import math
 
 class Instrument(object):
 
     def __init__(self, data):
         for key in data:
+            if key == 'adsr':
+                self.volume = self.getVolumeFromADSR(data[key])
+                continue
+
             setattr(self, key, data[key])
+
+    # attack - time taken for amplitude to rise from 0 to max (15)
+    # decay - time taken for amplitude to drop to sustain level
+    # sustain - amplitude at which the note is held
+    # release - time taken for amplitude to drop from sustain level to 0
+    #
+    # note:
+    # if decay is 0, max amplitude is the sustain value
+    #
+    def getVolumeFromADSR(self, adsr):
+        bits = adsr.split(' ')
+        attack = bits[0]
+        decay = bits[1]
+        sustain = bits[2]
+        release = bits[3]
+
+        max_volume = sustain if decay == 0 else 15
+
+        volume = ''
+        volume += str(max_volume) + ' ' if attack == '0' else ' '.join(self.divideIntoSteps(0, max_volume, attack)) + ' '
+        volume += ' '.join(self.divideIntoSteps(max_volume, sustain, decay)) + ' '
+        volume += ' '.join(self.divideIntoSteps(sustain, 0, release)) + ' '
+
+        return volume
+
+    def divideIntoSteps(self, min, max, steps):
+        diff = int(max) - int(min)
+        steps = int(steps) - 1
+        # print 'MIN', min
+        # print 'MAX', max
+        # print 'STEPS', steps
+        # print 'DIFF', diff
+
+        per_step = int(math.ceil(float(diff) / float(steps)))
+        extra = per_step * steps - diff
+
+        values = [str(min)]
+        last_value = str(min)
+
+        for x in range(1, steps):
+            if x < extra:
+                last_value = str(per_step - 1 + int(last_value))
+                values.append(last_value)
+                continue
+
+            last_value = str(per_step + int(last_value))
+            values.append(last_value)
+
+        values.append(str(max))
+        # print values
+        return values
 
     @staticmethod
     def reset():

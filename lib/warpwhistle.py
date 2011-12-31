@@ -201,7 +201,8 @@ class WarpWhistle(object):
 
     def replaceVariables(self, content):
         for key in self.vars:
-            content = content.replace(key, self.vars[key])
+            pattern = '(?<=\s)' + key + '(?=\s|\Z)'
+            content = re.sub(re.compile(pattern, re.MULTILINE), self.vars[key], content)
 
         return content
 
@@ -452,7 +453,7 @@ class WarpWhistle(object):
             return word
 
         # octave change with > or < or >>>
-        if re.match(r'\>+|\<+', word):
+        if re.match(r'\>+|\<+$', word):
             direction = word[0]
             count = len(word)
             current_octave = self.getDataForVoice(self.current_voices[0], WarpWhistle.OCTAVE)
@@ -520,7 +521,7 @@ class WarpWhistle(object):
             return new_word
 
         # regular note
-        match = re.match(r'(\[+)?([a-g]{1}(\+|\-)?)([\.0-9\^]+)?([\]\d+]+)?', word)
+        match = re.match(r'(\[+)?([a-g]{1}(\+|\-)?)([\.0-9\^]+)?([\]\d+]+)?$', word)
         if match:
             if "," in word and not self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
                 raise Exception('In order to use absolute notes you have to specify X-ABSOLUTE-NOTES')

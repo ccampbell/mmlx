@@ -1,0 +1,28 @@
+#TITLE Demo 4
+#COMPOSER Craig Campbell
+#PROGRAMER Craig Campbell
+ABCDE t115
+
+/**
+ * instruments
+ */
+inst1:
+    adsr: 0 0 4 40
+    timbre:  1
+
+inst2:
+    @extends "inst1"
+    adsr: 0 0 6 50
+
+inst3:
+    @extends "inst1"
+    adsr: 0 0 8 60
+
+inst4:
+    @extends "inst1"
+    adsr: 0 0 13 75
+
+
+A o4 @inst1 e- @inst2 g @inst3 b- @inst4 > e-2. @inst3 c2. < b-2. a-2. @inst2 b-2. @inst3 d2.
+B o3 @inst1 e- @inst2 e- @inst3 g @inst4 e-2. @inst3 a-2. g2. f2. @inst2 g2. @inst3 b-2.
+

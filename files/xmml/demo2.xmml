@@ -1,0 +1,19 @@
+#TITLE Demo 2
+#COMPOSER Craig Campbell
+#PROGRAMER Craig Campbell
+ABCDE t100
+
+square:
+    adsr: 10 0 10 0
+    timbre: 2
+    vibrato: 8 4 4
+
+hi-hat:
+    q: 1
+    volume: 11 9 7 5 3
+
+AB @square
+A o4 [c2. e2 /4 g2. /4 > c1]2
+B o3 [e2. g2 /4 e2. /4 > e1]2
+C o4 [c2 /4 > c1 q4 < c e g c e g]2
+D l4 @hi-hat [c]24

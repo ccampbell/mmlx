@@ -3,10 +3,10 @@
  */
 hi-hat:
     q: 1
-    volume: 11 9 7 5 3
+    volume: 9 9 7 5 3
 
 snare:
-    volume: 15 7 7 7 6 6 5 5 0
+    volume: 15 10 7 7 7 6 6 5 5 0
     pitch: -20 | 0 2 0
     q: 4
 

@@ -26,39 +26,48 @@ class Instrument(object):
         sustain = bits[2]
         release = bits[3]
 
-        max_volume = sustain if decay == 0 else 15
+        max_volume = sustain if int(decay) == 0 else 15
+
+        if attack == '0' and decay == '0' and sustain == '0' and release != '0':
+            sustain = 15
 
         volume = ''
-        volume += str(max_volume) + ' ' if attack == '0' else ' '.join(self.divideIntoSteps(0, max_volume, attack)) + ' '
-        volume += ' '.join(self.divideIntoSteps(max_volume, sustain, decay)) + ' '
-        volume += ' '.join(self.divideIntoSteps(sustain, 0, release)) + ' '
+        if attack != '0':
+            volume += str(max_volume) + ' ' if attack == '0' else ' '.join(self.divideIntoSteps(0, max_volume, attack)) + ' '
+
+        if sustain != '0':
+            volume += ' '.join(self.divideIntoSteps(max_volume, sustain, decay)) + ' '
+
+        if release != '0':
+            volume += ' '.join(self.divideIntoSteps(sustain, 0, release)) + ' '
+
+        if volume.strip() == '':
+            volume = '0'
 
         return volume
 
     def divideIntoSteps(self, min, max, steps):
-        diff = int(max) - int(min)
-        steps = int(steps) - 1
+        min = int(min)
+        max = int(max)
+        steps = int(steps)
+
         # print 'MIN', min
         # print 'MAX', max
         # print 'STEPS', steps
-        # print 'DIFF', diff
 
-        per_step = int(math.ceil(float(diff) / float(steps)))
-        extra = per_step * steps - diff
+        if steps == 1:
+            return [str(min), str(max)]
 
-        values = [str(min)]
-        last_value = str(min)
+        # figure out the equation of a line to match these coordinates
+        # coordinates are (0, min) and (steps - 1, max)
+        slope = float(max - min) / float(steps - 1)
+        equation = lambda x: slope * x + min
 
-        for x in range(1, steps):
-            if x < extra:
-                last_value = str(per_step - 1 + int(last_value))
-                values.append(last_value)
-                continue
+        values = []
+        for x in range(0, steps):
+            value = int(math.ceil(equation(x)))
+            values.append(str(value))
 
-            last_value = str(per_step + int(last_value))
-            values.append(last_value)
-
-        values.append(str(max))
         # print values
         return values
 

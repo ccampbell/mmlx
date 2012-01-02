@@ -14,6 +14,7 @@ class WarpWhistle(object):
     Q = 'q'
     ABSOLUTE_NOTES = 'X-ABSOLUTE-NOTES'
     TRANSPOSE = 'X-TRANSPOSE'
+    COUNTER = 'X-COUNTER'
 
     def __init__(self, content, logger):
         self.content = content
@@ -108,6 +109,9 @@ class WarpWhistle(object):
             else:
                 self.global_lines.append(match[0])
 
+            if match[1] == WarpWhistle.COUNTER:
+                Instrument.reset(match[3])
+
         return content
 
     def isReserved(self, var):
@@ -162,6 +166,9 @@ class WarpWhistle(object):
         return content
 
     def addInstrument(self, name, content):
+        if name == 'end':
+            raise Exception('end is a reserved word and connt be used for an instrument')
+
         lines = content.strip().split('\n')
         data = {}
 
@@ -544,22 +551,42 @@ class WarpWhistle(object):
             return new_note
 
         # instrument
-        match = re.match(r'^(\[+)?@([a-zA-Z0-9-_]+)$', word)
+        match = re.match(r'^(\[+)?(\+)?@([a-zA-Z0-9-_]+)$', word)
         if match:
-            if not match.group(2) in self.instruments:
-                return word
-
-            new_instrument = self.instruments[match.group(2)]
-            active_instrument = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
-            self.setDataForVoices(self.current_voices, WarpWhistle.INSTRUMENT, new_instrument)
 
             new_word = ''
+
+            # special case if you do @end you can end the currently active instruments
+            if match.group(3) == 'end':
+                active_instruments = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
+
+                for active_instrument in active_instruments:
+                    new_word += active_instrument.end(self)
+
+                self.setDataForVoices(self.current_voices, WarpWhistle.INSTRUMENT, [])
+                return new_word
+
+            # not a valid instrument
+            if not match.group(3) in self.instruments:
+                return word
+
+            new_instrument = self.instruments[match.group(3)]
+            active_instruments = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
+
+            if active_instruments is None:
+                active_instruments = []
 
             if match.group(1):
                 new_word += match.group(1)
 
-            if active_instrument:
-                new_word += active_instrument.end(self)
+            if len(active_instruments) and not match.group(2):
+                for active_instrument in active_instruments:
+                    new_word += active_instrument.end(self)
+
+                active_instruments = []
+
+            active_instruments.append(new_instrument)
+            self.setDataForVoices(self.current_voices, WarpWhistle.INSTRUMENT, active_instruments)
 
             new_word += new_instrument.start(self)
 
@@ -602,14 +629,14 @@ class WarpWhistle(object):
         self.logger.log('stripping comments', True)
         content = self.stripComments(content)
 
-        self.logger.log('parsing instruments', True)
-        content = self.processInstruments(content)
-
         self.logger.log('parsing variables', True)
         content = self.processVariables(content)
 
         self.logger.log('applying variables', True)
         content = self.replaceVariables(content)
+
+        self.logger.log('parsing instruments', True)
+        content = self.processInstruments(content)
 
         self.logger.log('collapsing spaces', True)
         content = self.collapseSpaces(content)

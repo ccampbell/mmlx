@@ -72,13 +72,15 @@ class Instrument(object):
         return values
 
     @staticmethod
-    def reset():
+    def reset(counter = 0):
+        counter = int(counter)
+
         Instrument.counters = {
-            'timbre': 20,
-            'volume': 20,
-            'pitch': 20,
-            'arpeggio': 20,
-            'vibrato': 20
+            'timbre': counter,
+            'volume': counter,
+            'pitch': counter,
+            'arpeggio': counter,
+            'vibrato': counter
         }
 
         Instrument.timbres = {}

@@ -1,11 +1,11 @@
 #TITLE Demo 1
 #COMPOSER Craig Campbell
 #PROGRAMER Craig Campbell
-@20 = { 2 }
-@v20 = { 10 }
-@v21 = { 9 9 7 5 3 }
-@v22 = { 15 10 7 7 7 6 6 5 5 0 }
-@EP20 = { -20 | 0 2 0 }
+@0 = { 2 }
+@v0 = { 10 }
+@v1 = { 9 9 7 5 3 }
+@v2 = { 15 10 7 7 7 6 6 5 5 0 }
+@EP0 = { -20 | 0 2 0 }
 ABCDE t135
-A l16 @@20 @v20 q4 o2 [[a > c e a]4 < [f a > c f]4 < [c e g > c]4 < [e g+ b > d]4]2
-D l16 [@v21 q1 [d]4 @v22 EP20 q4 c EPOF @v21 q1 [d]3]16
+A l16 @@0 @v0 q4 o2 [[a > c e a]4 < [f a > c f]4 < [c e g > c]4 < [e g+ b > d]4]2
+D l16 [@v1 q1 [d]4 @v2 EP0 q4 c EPOF @v1 q1 [d]3]16

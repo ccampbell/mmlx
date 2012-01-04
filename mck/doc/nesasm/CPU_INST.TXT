@@ -1,0 +1,92 @@
+
+ -*[ NES ASM v2.51 ]*-
+    ---------------
+
+
+    Instructions set
+    ----------------
+
+        +------+----------+-----------------------------+
+        |      | NVTBDIZC | Description                 |
+        +------+----------+-----------------------------+
+        | ADC  | XX0---XX | Add with Carry              |
+        | AND  | X-0---X- | Logical AND                 |
+        | ASL  | X-0---XX | Arithmetic Shift left       |
+        | BCC  | --0----- | Branch if Carry Clear       |
+        | BCS  | --0----- | Branch if Carry Set         |
+        | BEQ  | --0----- | Branch if Equal             |
+        | BIT  | XX0---X- | Bit Test                    |
+        | BMI  | --0----- | Branch if Minus             |
+        | BNE  | --0----- | Branch if Not Equal         |
+        | BPL  | --0----- | Branch if Plus              |
+        | BRA  | --0----- | Branch Always               |
+        | BRK  | --0----- | Break                       |
+        | BVC  | --0----- | Branch if Overflow Clear    |
+        | BVS  | --0----- | Branch if Overflow Set      |
+        | CLC  | --0----0 | Clear Carry flag            |
+        | CLD  | --0-0--- | Clear Decimal flag          |
+        | CLI  | --0--0-- | Clear Interrupt disable     |
+        | CLV  | -00----- | Clear Overflow flag         |
+        | CMP  | X-0---XX | Compare A with source       |
+        | CPX  | X-0---XX | Compare X with source       |
+        | CPY  | X-0---XX | Compare Y with source       |
+        | DEC  | X-0---X- | Decrement                   |
+        | DEX  | X-0---X- | Decrement X                 |
+        | DEY  | X-0---X- | Decrement Y                 |
+        | EOR  | X-0---X- | Logical Exclusive OR        |
+        | INC  | X-0---X- | Increment                   |
+        | INX  | X-0---X- | Increment X                 |
+        | INY  | X-0---X- | Increment Y                 |
+        | JMP  | --0----- | Jump                        |
+        | JSR  | --0----- | Jump to Sub Routine         |
+        | LDA  | X-0---X- | Load A                      |
+        | LDX  | X-0---X- | Load X                      |
+        | LDY  | X-0---X- | Load Y                      |
+        | LSR  | 0-0---XX | Logical Shift Right         |
+        | NOP  | --0----- | No Operation                |
+        | ORA  | X-0---X- | Logical inclusive OR        |
+        | PHA  | --0----- | Push A                      |
+        | PHP  | --0----- | Push P                      |
+        | PLA  | X-0---X- | Pull A                      |
+        | PLP  | XXXXXXXX | Pull P                      |
+        | ROL  | X-0---XX | Rotate Left                 |
+        | ROR  | X-0---XX | Rotate Right                |
+        | RTI  | XXXXXXXX | Return from Interrupt       |
+        | RTS  | --0----- | Return from Sub Routine     |
+        | SBC  | XX0---XX | Substract with Carry        |
+        | SEC  | --0----1 | Set Carry flag              |
+        | SED  | --0-1--- | Set Decimal flag            |
+        | SEI  | --0--1-- | Set Interrupt disable       |
+        | STA  | --0----- | Store A                     |
+        | STX  | --0----- | Store X                     |
+        | STY  | --0----- | Store Y                     |
+        | TAX  | X-0---X- | Transfer A to X             |
+        | TAY  | X-0---X- | Transfer A to Y             |
+        | TSX  | X-0---X- | Transfer S to X             |
+        | TXA  | X-0---X- | Transfer X to A             |
+        | TXS  | --0----- | Transfer X to S             |
+        | TYA  | X-0---X- | Transfer Y to A             |
+        +------+----------+-----------------------------+
+
+
+    Operand syntax
+    --------------
+
+        A        accumulator
+        #i       immediate
+        <n       zero page
+        <n,X     zero page indexed by X
+        <n,Y     zero page indexed by Y
+        [n]      indirect (*)
+        [n,X]    indirect pre-indexed by X (*)
+        [n],Y    indirect zero page post-indexed by Y
+        r        relative
+        n        absolute
+        n,X      absolute indexed by X
+        n,Y      absolute indexed by Y
+
+        (*) can be zero page or absolute
+
+
+--
+

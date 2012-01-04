@@ -1,0 +1,24 @@
+2A03/VRC6/VRC7/FDS/MMC5/N106/FME7 playable at the same time.
+
+#EX-VRC6
+M, N: pulse channel
+	volume range: v0-v15
+	duty cycle range: @0-@7
+O: sawtooth channel
+	volume range: v0-v63
+
+#EX-FME7
+X, Y, Z: square channel
+	volume range: v0-15
+
+#EX-MMC5
+a, b: pulse channel
+	volume range: v0-v15
+	duty cycle range: @0-@3
+
+how to make nsf
+1) put songdata.mml into 'songs' folder
+2) double click '00startcmd.bat' file
+3) type 'mknsf songdata' (WITHOUT .mml suffix)
+4) if compiled successfully, you will get 'sondata.nsf'
+

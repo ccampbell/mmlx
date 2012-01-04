@@ -1,0 +1,13 @@
+#PITCH-CORRECTION
+#EX-NAMCO106 8
+
+@N1 = {0, $09,$0c,$0d,$0c,$09,$07,$08,$0a,$0d,$0f,$0f,$0c,$09,$06,$05,$06,$09,$0a,$09,$06,$03,$00,$00,$02,$05,$07,$08,$06,$03,$02,$03,$06}
+
+@MP1 = {10 4 100 0}
+@MP2 = {10 4  15 0}
+
+P @@1 v10 t120 
+P MP1 l1 SA3o3 c SA4o4 c SA5o5 c SA6o6 c SA7o7 c SA8o8 c 
+P MP2 l1 SA3o3 c SA4o4 c SA5o5 c SA6o6 c SA7o7 c SA8o8 c 
+P MP2 l1 SA3o4 c SA4   c SA5   c SA6   c SA7   c SA8   c
+

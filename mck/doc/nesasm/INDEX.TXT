@@ -1,0 +1,22 @@
+
+ -*[ MAGIC KIT v2.51 ]*-
+    -----------------
+
+    \MAGICKIT
+    |
+    |--\DOC
+       |
+       |--\NES  INDEX.TXT      -- this file
+
+                HISTORY.TXT    -- revision history of the assembler
+
+                USAGE.TXT      -- how to use the assembler; syntax, etc...
+
+                CPU_INST.TXT   -- a list of all the 6502 CPU instructions
+                                  and addressing modes
+
+                NESHDR20.TXT   -- iNES header/format information file
+
+
+--
+

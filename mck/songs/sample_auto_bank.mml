@@ -1,0 +1,5 @@
+#AUTO-BANKSWITCH 0
+A o4 @1 v7
+B o4 D2 @1 r32 v2
+AB q7l8 [cdefgab>cc<bagfedc]500 ; big data
+

@@ -208,7 +208,7 @@ class WarpWhistle(object):
 
     def replaceVariables(self, content):
         for key in self.vars:
-            pattern = '(?<=\s)' + key + '(?=\s|\Z)'
+            pattern = '((?<=\s)|(?<=\[))' + key + '(?=\s|\Z|\])'
             content = re.sub(re.compile(pattern, re.MULTILINE), self.vars[key], content)
 
         return content
@@ -445,7 +445,7 @@ class WarpWhistle(object):
             return word
 
         # q change
-        if re.match(r'q[0-8]+$', word):
+        if re.match(r'q[0-8]$', word):
             self.setDataForVoices(self.current_voices, WarpWhistle.Q, int(word[1:]))
             return word
 

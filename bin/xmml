@@ -14,9 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import getopt, sys, os
-from xmmllib.listener import Listener
-from xmmllib.musicbox import MusicBox
-from xmmllib.logger import Logger
+
+
+try:
+    from xmmllib.listener import Listener
+    from xmmllib.musicbox import MusicBox
+    from xmmllib.logger import Logger
+except:
+    path = os.path.realpath(__file__ + '/../../')
+    sys.path.append(path)
+    from xmmllib.listener import Listener
+    from xmmllib.musicbox import MusicBox
+    from xmmllib.logger import Logger
 
 def showUsage():
     print "usage"

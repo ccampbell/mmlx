@@ -9,17 +9,27 @@ class MusicBox(object):
         self.logger = logger
 
     def createNSF(self, path):
-        pass
+
         # p = subprocess.Popen(["which", "xmml"], stdout=subprocess.PIPE)
         # # print p.communicate()
         # print os.path.dirname(os.path.realpath(p.communicate()[0].strip()))
         # # print os.path.realpath(out)
         # return
         #
+        # original_path = os.getcwd()
+
         # os.chdir(os.path.dirname(path))
-        # # os.environ['NES_INCLUDE'] =
-        # subprocess.call(['ppmckc', '-m1', '-i', os.path.basename(path)])
-        # subprocess.call(['nesasm', '-s', '-raw', ])
+        nes_include_path = os.path.join(os.path.dirname(__file__), 'nes_include')
+
+        os.environ['NES_INCLUDE'] = nes_include_path
+        subprocess.call(['ppmckc', '-m1', '-i', path])
+
+        subprocess.call(['nesasm', '-s', '-raw', os.path.join(nes_include_path, 'ppmck.asm')])
+
+        os.rename(os.path.join(nes_include_path, 'ppmck.nes'), path.replace('.mml', '.nsf'))
+        os.unlink('define.inc')
+        os.unlink('effect.h')
+        os.unlink(path.replace('.mml', '.h'))
 
     def processFile(self, input, output):
         Instrument.reset()

@@ -14,9 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import getopt, sys, os
-from lib.listener import Listener
-from lib.musicbox import MusicBox
-from lib.logger import Logger
+from xmmllib.listener import Listener
+from xmmllib.musicbox import MusicBox
+from xmmllib.logger import Logger
 
 def showUsage():
     print "usage"

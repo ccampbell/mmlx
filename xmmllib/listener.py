@@ -23,7 +23,7 @@ class Listener(object):
             is_dir = os.path.isdir(start)
 
         if is_dir:
-            files = self.getFilesFromDir(start, "xmml")
+            files = self.getFilesFromDir(start, "mmlx")
             output_file = None
         else:
             files = [start]
@@ -39,7 +39,7 @@ class Listener(object):
                 continue
 
             last_changed = os.stat(file).st_mtime
-            output_file = output_file if output_file is not None else os.path.join(end, filename.replace(".xmml", ".mml"))
+            output_file = output_file if output_file is not None else os.path.join(end, filename.replace(".mmlx", ".mml"))
 
             if not self.file_list.has_key(file):
                 self.file_list[file] = last_changed

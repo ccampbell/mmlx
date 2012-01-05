@@ -10,15 +10,6 @@ class MusicBox(object):
 
     def createNSF(self, path):
 
-        # p = subprocess.Popen(["which", "xmml"], stdout=subprocess.PIPE)
-        # # print p.communicate()
-        # print os.path.dirname(os.path.realpath(p.communicate()[0].strip()))
-        # # print os.path.realpath(out)
-        # return
-        #
-        # original_path = os.getcwd()
-
-        # os.chdir(os.path.dirname(path))
         nes_include_path = os.path.join(os.path.dirname(__file__), 'nes_include')
 
         os.environ['NES_INCLUDE'] = nes_include_path

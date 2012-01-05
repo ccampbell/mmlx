@@ -17,15 +17,15 @@ import getopt, sys, os
 
 
 try:
-    from xmmllib.listener import Listener
-    from xmmllib.musicbox import MusicBox
-    from xmmllib.logger import Logger
+    from mmlxlib.listener import Listener
+    from mmlxlib.musicbox import MusicBox
+    from mmlxlib.logger import Logger
 except:
     path = os.path.realpath(__file__ + '/../../')
     sys.path.append(path)
-    from xmmllib.listener import Listener
-    from xmmllib.musicbox import MusicBox
-    from xmmllib.logger import Logger
+    from mmlxlib.listener import Listener
+    from mmlxlib.musicbox import MusicBox
+    from mmlxlib.logger import Logger
 
 def showUsage():
     print "usage"

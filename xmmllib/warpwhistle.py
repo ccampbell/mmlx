@@ -67,7 +67,7 @@ class WarpWhistle(object):
         matches = re.findall(r'(@import\s{1,}(\'|\")(.*)(\2))$', content, re.MULTILINE)
 
         for match in matches:
-            filename = match[2] if match[2].endswith('.xmml') else match[2] + '.xmml'
+            filename = match[2] if match[2].endswith('.mmlx') else match[2] + '.mmlx'
             disk_path = os.path.join(self.import_directory, filename)
             file_content = Util.openFile(disk_path)
             content = content.replace(match[0], file_content)
@@ -472,8 +472,8 @@ class WarpWhistle(object):
 
             return word
 
-        # rewrite special voices for xmml such as c4 or G+/4^8
-        # to use this put the line X-ABSOLUTE-NOTES at the top of your xmml file
+        # rewrite special voices for mmlx such as c4 or G+/4^8
+        # to use this put the line X-ABSOLUTE-NOTES at the top of your mmlx file
         match = re.match(r'(\[+)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})?(,(\d+\.?)(\^[0-9\^]+)?)?([\]\d]+)?$', word)
         if match and self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
             is_noise_channel = self.current_voices[0] == 'D'

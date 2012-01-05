@@ -1,16 +1,16 @@
-XMML is short for eXtended MML.  It allows you to do things that you cannot do using traditional MML.
+MMLX is short for MML eXtended.  It allows you to do things that you cannot do using traditional MML.
 
-XMML allows you to:
+MMLX allows you to:
 - define and use instrument patches
 - use ADSR envelopes for creating instruments
-- import other xmml files or instruments into your current file
+- import other mmlx files or instruments into your current file
 - use portamento to slide from note to note
 - store data such as chords or patterns in variables
 - transpose to any key
 - target notes directly without having to jump up and down octaves
 
 To-Do
-- Throw proper warnings/errors/syntax checks when code is not valid xmml
+- Throw proper warnings/errors/syntax checks when code is not valid mmlx
 - Documentation
 - Unit tests
 - Automatic sample conversions from wav files

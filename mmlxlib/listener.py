@@ -49,7 +49,7 @@ class Listener(object):
             if last_changed != self.file_list[file]:
                 self.logger.log("detected change to: " + file)
                 self.file_list[file] = last_changed
-                self.callback(file, output_file)
+                self.callback(file, output_file, True)
 
     def watch(self, start, end):
         is_dir = os.path.isdir(start)

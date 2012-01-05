@@ -25,7 +25,7 @@ minor:
     arpeggio: 0 0 4 0 0 3 0 0 5 0 0
 
 // volume for self delay
-@v1 = { 5 }
+@v20 = { 5 }
 
-A o4 SD0 @vr1 [@square c c @major c / @square g d d @major d / @square a g g @major g / @square d e e @minor e @square e]2 SDOF
+A o4 SD0 @vr20 [@square c c @major c / @square g d d @major d / @square a g g @major g / @square d e e @minor e @square e]2 SDOF
 C o4 [c c e8 e8 g8 g8 d d f+8 f+8 a8 a8 g g b8 b8 d8 d8 e e g8 g8 b8 b8]2

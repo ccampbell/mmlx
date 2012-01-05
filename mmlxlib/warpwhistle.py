@@ -551,7 +551,7 @@ class WarpWhistle(object):
             return new_note
 
         # instrument
-        match = re.match(r'^(\[+)?(\+)?@([a-zA-Z0-9-_]+)$', word)
+        match = re.match(r'^(\[+)?(\+)?@([a-zA-Z0-9-_]+)([\]\d+]+)?$', word)
         if match:
 
             new_word = ''
@@ -589,6 +589,9 @@ class WarpWhistle(object):
             self.setDataForVoices(self.current_voices, WarpWhistle.INSTRUMENT, active_instruments)
 
             new_word += new_instrument.start(self)
+
+            if match.group(4):
+                new_word += match.group(4)
 
             return new_word
 

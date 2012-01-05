@@ -20,7 +20,7 @@ f_major = [f2 a2 c3 f3]4
 c_major = [c2 e2 g2 c3]4
 e_major7 = [e2 g+2 b2 d3]4
 
-verse_beat = @hi-hat [d]4 @snare c @hi-hat [d]3
+verse_beat = @hi-hat [d]4 @snare c @hi-hat [d]2 @snare c @hi-hat [d]4 @snare c @hi-hat [d]3
 
 A l16 @square-short [a_minor f_major c_major e_major7]2
-D l16 [verse_beat]16
+D l16 [verse_beat]8

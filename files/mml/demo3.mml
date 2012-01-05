@@ -11,6 +11,6 @@
 @EN0 = { 0 0 3 0 0 4 0 0 5 0 0 }
 @EN1 = { 0 0 4 0 0 3 0 0 5 0 0 }
 ABCDE t150
-@v1 = { 5 }
-A o4 SD0 @vr1 [@@0 @v0 q6 c c @@1 @v1 EN0 q4 c ENOF @@0 @v0 q6 EP0 c EPOF d d @@1 @v1 EN0 q4 d ENOF @@0 @v0 q6 EP1 d EPOF g g @@1 @v1 EN0 q4 g ENOF @@0 @v0 q6 EP2 g EPOF e e @@1 @v1 EN1 q4 e ENOF @@0 @v0 q6 e]2 SDOF
+@v20 = { 5 }
+A o4 SD0 @vr20 [@@0 @v0 q6 c c @@1 @v1 EN0 q4 c ENOF @@0 @v0 q6 EP0 c EPOF d d @@1 @v1 EN0 q4 d ENOF @@0 @v0 q6 EP1 d EPOF g g @@1 @v1 EN0 q4 g ENOF @@0 @v0 q6 EP2 g EPOF e e @@1 @v1 EN1 q4 e ENOF @@0 @v0 q6 e]2 SDOF
 C o4 [c c e8 e8 g8 g8 d d f+8 f+8 a8 a8 g g b8 b8 d8 d8 e e g8 g8 b8 b8]2

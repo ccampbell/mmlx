@@ -16,9 +16,10 @@ class WarpWhistle(object):
     TRANSPOSE = 'X-TRANSPOSE'
     COUNTER = 'X-COUNTER'
 
-    def __init__(self, content, logger):
+    def __init__(self, content, logger, options):
         self.content = content
         self.logger = logger
+        self.options = options
         self.reset()
 
     def reset(self):
@@ -623,25 +624,25 @@ class WarpWhistle(object):
         return ' '.join(new_words)
 
     def process(self, content):
-        self.logger.log('stripping comments', True)
+        self.logger.log('- stripping comments', True)
         content = self.stripComments(content)
 
-        self.logger.log('proccessing imports', True)
+        self.logger.log('- proccessing imports', True)
         content = self.processImports(content)
 
-        self.logger.log('stripping comments', True)
+        self.logger.log('- stripping comments again', True)
         content = self.stripComments(content)
 
-        self.logger.log('parsing variables', True)
+        self.logger.log('- parsing variables', True)
         content = self.processVariables(content)
 
-        self.logger.log('applying variables', True)
+        self.logger.log('- applying variables', True)
         content = self.replaceVariables(content)
 
-        self.logger.log('parsing instruments', True)
+        self.logger.log('- parsing instruments', True)
         content = self.processInstruments(content)
 
-        self.logger.log('collapsing spaces', True)
+        self.logger.log('- collapsing spaces', True)
         content = self.collapseSpaces(content)
 
         lines = content.split('\n')
@@ -653,7 +654,7 @@ class WarpWhistle(object):
 
         content = self.renderInstruments(content)
 
-        self.logger.log('replace unneccessary octave shifts', True)
+        self.logger.log('- replacing unneccessary octave shifts', True)
         levels = math.ceil(abs(float(self.getGlobalVar(WarpWhistle.TRANSPOSE))) / float(12))
         for x in range(0, int(levels) + 1):
             content = self.collapseSpaces(content)
@@ -661,7 +662,7 @@ class WarpWhistle(object):
 
         content = self.collapseSpaces(content)
 
-        self.logger.log('removing blank lines', True)
+        self.logger.log('- removing blank lines', True)
         content = self.removeBlankLines(content)
 
         return content

@@ -15,70 +15,114 @@
 # limitations under the License.
 import getopt, sys, os
 
+options = {
+    'verbose': False,
+    'open_nsf': False,
+    'listen': False,
+    'local': False,
+    'create_nsf': True
+}
 
 try:
     from mmlxlib.listener import Listener
     from mmlxlib.musicbox import MusicBox
     from mmlxlib.logger import Logger
 except:
+    options['local'] = True
     path = os.path.realpath(__file__ + '/../../')
     sys.path.append(path)
     from mmlxlib.listener import Listener
     from mmlxlib.musicbox import MusicBox
     from mmlxlib.logger import Logger
 
-def showUsage():
-    print "usage"
-    sys.exit(0)
+def showUsage(message = None):
+    logger = Logger(options)
+    musicbox = MusicBox(logger)
+    musicbox.showUsage(message)
+    sys.exit(1)
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "", ["verbose", "help", "watch="])
+    opts, args = getopt.getopt(sys.argv[1:], "", ["verbose", "help", "watch=", "open-nsf", "no-nsf"])
 except:
     showUsage()
 
-verbose = False
 start = None
-listen = False
 file_list = {}
+
+if len(opts) == 0:
+    for arg in args:
+        opts.append((arg, ''))
+
 for key, value in opts:
     if key == "--help":
         showUsage()
     elif key == "--verbose":
-        verbose = True
+        options['verbose'] = True
+    elif key == "--open-nsf":
+        options['open_nsf'] = True
+    elif key == "--no-nsf":
+        options['create_nsf'] = False
     elif key == "--watch":
-        listen = True
+        options['listen'] = True
         bits = value.split(':')
         start = bits[0]
-        if len(bits) == 1:
+        if len(bits) == 1 and os.path.isdir(start):
             end = bits[0]
             continue;
+
+        if len(bits) == 1 and not os.path.isdir(start):
+            end = start.replace('.mmlx', '.mml')
+            continue
 
         end = bits[1]
 
 def isFileOrDirectory(path):
     return os.path.isfile(path) or os.path.isdir(path)
 
-if len(args) >= 2 and isFileOrDirectory(args[0]):
-    start = args[0]
-    end = args[1]
+try:
+    logger = Logger(options)
 
-if start is None:
-    print "file or directory to watch is required"
-    showUsage()
+    if len(args) >= 2:
+        start = args[0]
+        end = args[1]
 
-if not isFileOrDirectory(start):
-    print start,"is not a file or directory"
-    showUsage()
+    if len(args) == 1:
+        start = args[0]
+        end = start.replace('.mmlx', '.mml')
 
-# try:
-logger = Logger(verbose)
-listener = Listener(logger)
-musicbox = MusicBox(logger)
-listener.onChange(musicbox.processFile)
-if listen:
-    listener.watch(start, end)
-else:
-    listener.process(start, end)
-# except:
-    # sys.exit(1)
-    # pass
+    if start is None:
+        showUsage()
+
+    if not isFileOrDirectory(start):
+        showUsage(logger.color(start, logger.YELLOW) + " is not a file or directory\n")
+
+    listener = Listener(logger)
+    musicbox = MusicBox(logger, options)
+    listener.onChange(musicbox.processFile)
+    if options['listen']:
+        listener.watch(start, end)
+    else:
+        listener.process(start, end)
+        logger.log(logger.color('Done!', logger.PINK))
+        sys.exit(0)
+
+except KeyboardInterrupt:
+    phrases = [
+        'Sayonara!',
+        'Goodbye! Have a nice day!',
+        'Come back soon!',
+        'Sad to see you leaving already!',
+        'Hasta la vista, baby'
+    ]
+    from random import choice
+    logger.log(logger.color('\n' + choice(phrases), logger.PINK))
+    sys.exit(0)
+
+except Exception:
+    logger.log(logger.color('Sorry, an error occured:\n', logger.RED))
+    import traceback
+    lines = traceback.format_exc().splitlines()
+    logger.log(logger.color(lines.pop(), logger.RED) + '\n')
+    logger.log('\n'.join(lines))
+    logger.log('')
+    sys.exit(1)

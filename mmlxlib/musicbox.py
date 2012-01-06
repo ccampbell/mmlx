@@ -28,6 +28,7 @@ class MusicBox(object):
         logger.log(logger.color('--help', logger.GRAY) + '                                shows help dialogue')
         logger.log(logger.color('--verbose', logger.GRAY) + '                             shows verbose output')
         logger.log(logger.color('--open-nsf', logger.GRAY) + '                            opens nsf file on save')
+        logger.log(logger.color('--no-nsf', logger.GRAY) + '                              do not create nsf file on save')
         logger.log(logger.color('--watch', logger.GRAY) + logger.color(' path/to/mmlx', logger.YELLOW) + logger.color(':', logger.GRAY) + logger.color('path/to/mml', logger.YELLOW) + '      watch for changes in first directory and compile to second')
         logger.log(logger.color('\nEXAMPLES:', logger.WHITE, True))
 

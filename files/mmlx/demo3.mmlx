@@ -3,18 +3,21 @@
 #PROGRAMER Craig Campbell
 ABCDE t150
 
+// start the counter at 20 since we have already used v1
+#X-COUNTER 20
+
 /**
  * instruments
  */
 square:
-    volume: 10
     timbre: 1
+    volume: 10
     q: 6
 
 chord:
-    q: 4
     timbre: 2
     volume: 12
+    q: 4
 
 major:
     @extends "chord"
@@ -25,7 +28,7 @@ minor:
     arpeggio: 0 0 4 0 0 3 0 0 5 0 0
 
 // volume for self delay
-@v20 = { 5 }
+@v1 = { 5 }
 
-A o4 SD0 @vr20 [@square c c @major c / @square g d d @major d / @square a g g @major g / @square d e e @minor e @square e]2 SDOF
+A o4 SD0 @vr1 [@square c c @major c / @square g d d @major d / @square a g g @major g / @square d e e @minor e @square e]2 SDOF
 C o4 [c c e8 e8 g8 g8 d d f+8 f+8 a8 a8 g g b8 b8 d8 d8 e e g8 g8 b8 b8]2

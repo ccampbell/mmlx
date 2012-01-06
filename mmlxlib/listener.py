@@ -47,7 +47,7 @@ class Listener(object):
                 continue
 
             if last_changed != self.file_list[file]:
-                self.logger.log("detected change to: " + file)
+                self.logger.log(self.logger.color("detected change to: ", self.logger.GRAY) + self.logger.color(file, self.logger.UNDERLINE))
                 self.file_list[file] = last_changed
                 self.callback(file, output_file, True)
 

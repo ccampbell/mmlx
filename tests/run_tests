@@ -2,7 +2,7 @@
 
 import os, unittest, sys, inspect
 
-cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0] + '/../lib'
+cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0] + '/../mmlxlib'
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 

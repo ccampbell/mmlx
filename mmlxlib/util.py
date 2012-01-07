@@ -1,4 +1,4 @@
-import operator
+import operator, os
 
 class Util(object):
 
@@ -18,3 +18,7 @@ class Util(object):
     @staticmethod
     def sortDictionary(dictionary):
         return sorted(dictionary.iteritems(), key=operator.itemgetter(1))
+
+    @staticmethod
+    def isFileOrDirectory(path):
+        return os.path.isfile(path) or os.path.isdir(path)

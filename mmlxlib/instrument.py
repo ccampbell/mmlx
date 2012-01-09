@@ -5,11 +5,10 @@ class Instrument(object):
 
     def __init__(self, data):
         for key in data:
-            if key == 'adsr':
-                self.volume = self.getVolumeFromADSR(data[key])
-                continue
-
             setattr(self, key, data[key])
+
+        if hasattr(self, "adsr"):
+            self.volume = self.getVolumeFromADSR(self.adsr)
 
     # attack - time taken for amplitude to rise from 0 to max (15)
     # decay - time taken for amplitude to drop to sustain level
@@ -27,6 +26,9 @@ class Instrument(object):
         release = bits[3]
 
         max_volume = sustain if int(decay) == 0 else 15
+
+        if hasattr(self, "max_volume"):
+            max_volume = int(self.max_volume)
 
         if attack == '0' and decay == '0' and sustain == '0' and release != '0':
             sustain = 15

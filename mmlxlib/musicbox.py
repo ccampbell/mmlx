@@ -67,7 +67,10 @@ class MusicBox(object):
         if not Util.isFileOrDirectory(start):
             self.showUsage(self.logger.color(start, self.logger.YELLOW) + " is not a file or directory\n")
 
-        return (options, start, end)
+        options["start"] = start
+        options["end"] = end
+
+        return options
 
     def play(self, args, local):
         # create an intial logger so we can log before args are processed
@@ -75,9 +78,7 @@ class MusicBox(object):
         self.drawLogo()
 
         options = self.processArgs(args, local)
-        self.options = options[0]
-        start = options[1]
-        end = options[2]
+        self.options = options
 
         # set up the logger with the correct options
         self.logger = Logger(self.options)
@@ -86,15 +87,11 @@ class MusicBox(object):
         listener.onChange(self.processFile)
 
         if self.options['listen']:
-            listener.watch(start, end)
+            listener.watch(options['start'], options['end'])
         else:
-            listener.process(start, end)
-            logger.log(logger.color('Done!', logger.PINK))
+            listener.process(options['start'], options['end'])
+            self.logger.log(self.logger.color('Done!', self.logger.PINK))
             sys.exit(0)
-
-
-
-
 
     def drawLogo(self):
         self.logger.log(self.logger.color('_|      _|  _|      _|  _|        _|      _|  ', self.logger.PINK))

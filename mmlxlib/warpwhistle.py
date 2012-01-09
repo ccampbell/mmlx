@@ -473,6 +473,20 @@ class WarpWhistle(object):
 
             return word
 
+        # dmc declaration
+        match = re.match(r'(\{\s{0,})?(\'|\")(.*\.dmc)(\2)\s{0,},', word)
+        if match:
+            mmlx_dir = self.options['start'] if os.path.isdir(self.options['start']) else os.path.dirname(self.options['start'])
+            new_path = os.path.join(mmlx_dir, match.group(3))
+            new_word = ''
+
+            if match.group(1):
+                new_word += match.group(1)
+
+            new_word += match.group(2) + new_path + match.group(2) + ','
+
+            return new_word
+
         # rewrite special voices for mmlx such as c4 or G+/4^8
         # to use this put the line X-ABSOLUTE-NOTES at the top of your mmlx file
         match = re.match(r'(\[+)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})?(,(\d+\.?)(\^[0-9\^]+)?)?([\]\d]+)?$', word)

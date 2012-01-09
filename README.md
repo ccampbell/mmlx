@@ -5,6 +5,8 @@ http://en.wikipedia.org/wiki/Music_Macro_Language
 
 It is short for MML eXtended. Everything written in MML is valid in MMLX, but there are additional features.
 
+If you are familiar with web programming, MMLX is to MML what SASS is to CSS
+
 ## Dependencies
 
 **setuptools** or **distribute**:
@@ -45,5 +47,3 @@ for additional options run
 * Ability to create random instruments
 * Ability to use absolute paths to directories
 * Ability to generate separate NSF files for different voices
-
-If you are familiar with web programming, MMLX is to MML what SASS is to CSS

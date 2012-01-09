@@ -7,6 +7,9 @@ It is short for MML eXtended. Everything written in MML is valid in MMLX, but th
 
 If you are familiar with web programming, MMLX is to MML what SASS is to CSS
 
+You can check out some samples in the files/mmlx directory of this repository.  Also an MML beginner's guide is available at:
+http://nullsleep.com/treasure/mck_guide/
+
 ## Dependencies
 
 **setuptools** or **distribute**:

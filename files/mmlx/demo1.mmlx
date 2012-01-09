@@ -6,7 +6,7 @@
  * MMLX Variables
  */
 #X-ABSOLUTE-NOTES
-#X-TRANSPOSE 0
+#X-TRANSPOSE -1
 
 ABCDE t135
 
@@ -14,6 +14,10 @@ ABCDE t135
 
 /*
  * Chords
+ *
+ * note that these notes are absolute notes (note + octave)
+ * so a2 here means it is an A in the second octave and not an A that is a half note
+ * this is triggered using the #X-ABSOLUTE-NOTES option above
  */
 a_minor = [a2 c3 e3 a3]4
 f_major = [f2 a2 c3 f3]4

@@ -44,5 +44,6 @@ for additional options run
 * Automatic DPCM sample conversions from wav files
 * Ability to create random instruments
 * Ability to use absolute paths to directories
+* Ability to generate separate NSF files for different voices
 
 If you are familiar with web programming, MMLX is to MML what SASS is to CSS

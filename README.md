@@ -33,7 +33,7 @@ for additional options run
 * import other MMLX files or instruments into your current file
 * use portamento to slide smoothly from one note to the next
 * store data such as chords or patterns in variables
-* transpose to any key
+* transpose to any key
 * target notes directly by octave without having to manually move up and down octaves
 * auto generate NSF files on save and open them
 

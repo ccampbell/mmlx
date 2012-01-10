@@ -1,0 +1,14 @@
+#TITLE My First Chiptune
+#COMPOSER Your Name
+#PROGRAMER Your Name
+@0 = { 2 }
+@1 = { 0 }
+@v0 = { 15 15 14 14 13 13 12 12 11 10 10 10 10 9 9 9 8 8 8 7 7 7 6 6 6 5 5 5 4 4 4 3 3 3 2 2 2 1 1 0 }
+@v1 = { 12 12 11 11 10 10 9 9 8 7 7 7 7 7 7 6 6 6 6 5 5 5 5 4 4 4 4 3 3 3 3 2 2 2 2 1 1 1 1 0 }
+@v2 = { 10 8 6 4 2 0 }
+@MP0 = { 2 4 4 }
+ABCD t110
+A o4 @@0 @v0 < a+ > c d d+ f g a > c < a+1 >
+B o3 @@1 @v1 d d+ f g a a+ > c d+ d1 
+C o4 MP0 < a+1 > f1 < a+2 >
+D @v2 q4 e [f16]4 f8 e f8 f f f8 e8 [f32]8 f

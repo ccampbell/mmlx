@@ -21,11 +21,11 @@ chord:
 
 major:
     @extends "chord"
-    arpeggio: 0 0 3 0 0 4 0 0 5 0 0
+    arpeggio: 0 0 4 0 0 3 0 0 5 0 0
 
 minor:
     @extends "chord"
-    arpeggio: 0 0 4 0 0 3 0 0 5 0 0
+    arpeggio: 0 0 3 0 0 4 0 0 5 0 0
 
 // volume for self delay
 @v1 = { 5 }

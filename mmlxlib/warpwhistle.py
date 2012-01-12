@@ -208,7 +208,7 @@ class WarpWhistle(object):
     def processInstruments(self, content):
         matches = re.findall(r'(^([a-zA-Z0-9-_]+):( {0,}(\n( {4}|\t)(.*))+)\n)', content, re.MULTILINE)
         for match in matches:
-            self.addInstrument(match[1], match[2])
+            self.addInstrument(match[1].lower(), match[2])
             content = content.replace(match[0], '')
 
         self.updateInstruments()

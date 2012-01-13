@@ -122,8 +122,9 @@ class MusicBox(object):
         logger.log(logger.color('--help', logger.WHITE) + '                                shows help dialogue')
         logger.log(logger.color('--verbose', logger.WHITE) + '                             shows verbose output')
         logger.log(logger.color('--open-nsf', logger.WHITE) + '                            opens nsf file on save')
-        logger.log(logger.color('--no-nsf', logger.WHITE) + '                              do not create nsf file on save')
-        logger.log(logger.color('--watch', logger.WHITE) + logger.color(' path/to/mmlx', logger.YELLOW) + logger.color(':', logger.GRAY) + logger.color('path/to/mml', logger.YELLOW) + '      watch for changes in first directory and compile to second')
+        logger.log(logger.color('--create-mml ' + logger.color('0', logger.YELLOW), logger.WHITE) +'                        creates an MML file on save (defaults to 0)')
+        logger.log(logger.color('--create-nsf ' + logger.color('1', logger.YELLOW), logger.WHITE) +'                        creates an NSF file on save (defaults to 1)')
+        logger.log(logger.color('--watch', logger.WHITE) + logger.color(' path/to/mmlx', logger.YELLOW) + logger.color(':', logger.GRAY) + logger.color('path/to/mml', logger.YELLOW) + '      watches for changes in first directory and compiles to second')
         logger.log(logger.color('\nEXAMPLES:', logger.WHITE, True))
 
         logger.log(logger.color('watch directory for changes in .mmlx files:', logger.GRAY))
@@ -136,11 +137,11 @@ class MusicBox(object):
         logger.log(logger.color('mmlx --watch path/to/file.mmlx:path/to/otherfile.mml', logger.BLUE, True))
 
         logger.log(logger.color('\nrun once for a single file:', logger.GRAY))
-        logger.log(logger.color('mmlx path/to/file.mmlx path/to/otherfile.mml', logger.BLUE, True))
+        logger.log(logger.color('mmlx path/to/file.mmlx path/to/otherfile.nsf', logger.BLUE, True))
         logger.log(logger.color('mmlx path/to/file.mmlx', logger.BLUE, True))
 
         logger.log(logger.color('\nrun once for a directory:', logger.GRAY))
-        logger.log(logger.color('mmlx path/to/mmlx path/to/mml', logger.BLUE, True))
+        logger.log(logger.color('mmlx path/to/mmlx path/to/nsf', logger.BLUE, True))
         logger.log('')
 
         sys.exit(1)

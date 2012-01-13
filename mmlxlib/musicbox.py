@@ -29,61 +29,58 @@ class MusicBox(object):
             'open_nsf': False,
             'listen': False,
             'local': local,
-            'create_nsf': True
+            'create_nsf': True,
+            'create_mml': False,
+            'start': None,
+            'end': None
         }
 
+        # valid_args = ['--verbose', '--help', '--watch', '--open-nsf', '--create-nsf', '--create-mml']
+
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "", ["verbose", "help", "watch=", "open-nsf", "no-nsf"])
+            for key,arg in enumerate(args):
+                if arg == '--verbose':
+                    options['verbose'] = True
+                elif arg == '--help':
+                    self.showUsage()
+                elif arg == '--open-nsf':
+                    options['open_nsf'] = True
+                elif arg == '--create-nsf':
+                    value = args[key + 1]
+                    del(args[key + 1])
+                    options['create_nsf'] = False if value == '0' else True
+                elif arg == '--create-mml':
+                    value = args[key + 1]
+                    del(args[key + 1])
+                    options['create_mml'] = True if value == '1' else False
+                elif arg == '--watch':
+                    options['listen'] = True
+                    value = args[key + 1]
+                    del(args[key + 1])
+                    bits = value.split(':')
+                    options['start'] = bits[0]
+                    options['end'] = bits[1] if len(bits) > 1 else None
+                else:
+                    if options['start'] is None:
+                        options['start'] = arg
+                    elif options['end'] is None:
+                        options['end'] = arg
         except:
             self.showUsage()
 
-        start = None
-        end = None
-        file_list = {}
+        if not options['create_nsf'] and not options['create_mml']:
+            self.showUsage('You need to create an MML file or an NSF file')
 
-        if len(opts) == 0:
-            for arg in args:
-                opts.append((arg, ''))
+        if options['start'] is None:
+            self.showUsage('You haven\'t specified a file or directory to convert')
 
-        for key, value in opts:
-            if key == "--help":
-                self.showUsage()
-            elif key == "--verbose":
-                options['verbose'] = True
-            elif key == "--open-nsf":
-                options['open_nsf'] = True
-            elif key == "--no-nsf":
-                options['create_nsf'] = False
-            elif key == "--watch":
-                options['listen'] = True
-                bits = value.split(':')
-                start = bits[0]
-                if len(bits) == 1 and os.path.isdir(start):
-                    end = bits[0]
-                    continue;
+        if not Util.isFileOrDirectory(options['start']):
+            self.showUsage(self.logger.color(options['start'], self.logger.YELLOW) + " is not a file or directory")
 
-                if len(bits) == 1 and not os.path.isdir(start):
-                    end = start.replace('.mmlx', '.mml')
-                    continue
+        if options['end'] is None:
+            options['end'] = options['start'].replace('.mmlx', '.mml')
 
-                end = bits[1]
-
-        if len(args) >= 2 and start is None:
-            start = args[0]
-            end = args[1]
-
-        if len(args) == 1:
-            start = args[0]
-            end = start.replace('.mmlx', '.mml')
-
-        if start is None:
-            self.showUsage()
-
-        if not Util.isFileOrDirectory(start):
-            self.showUsage(self.logger.color(start, self.logger.YELLOW) + " is not a file or directory\n")
-
-        options["start"] = start
-        options["end"] = end
+        options['end'] = options['end'].replace('.nsf', '.mml')
 
         return options
 
@@ -120,7 +117,7 @@ class MusicBox(object):
         logger = self.logger
         if message is not None:
             logger.log(logger.color('ERROR:', logger.RED))
-            logger.log(message)
+            logger.log(message + "\n")
 
         logger.log(logger.color('ARGUMENTS:', logger.WHITE, True))
         logger.log(logger.color('--help', logger.WHITE) + '                                shows help dialogue')
@@ -192,11 +189,16 @@ class MusicBox(object):
         whistle.import_directory = os.path.dirname(input)
         content = whistle.play()
 
-        self.logger.log('generating file: ' + self.logger.color(output, self.logger.YELLOW))
+        if self.options['create_mml']:
+            self.logger.log('generating file: ' + self.logger.color(output, self.logger.YELLOW))
+
         Util.writeFile(output, content)
 
         if self.options['create_nsf']:
             self.createNSF(output, open_file)
+
+        if not self.options['create_mml']:
+            Util.removeFile(output)
 
         self.logger.log("")
 

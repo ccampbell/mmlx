@@ -21,7 +21,7 @@ from listener import Listener
 from logger import Logger
 
 class MusicBox(object):
-    VERSION = '1.0'
+    VERSION = '1.0.1'
 
     def processArgs(self, args, local):
         options = {

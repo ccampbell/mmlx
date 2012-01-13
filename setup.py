@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='mmlx',
-    version='1.0',
+    version='1.0.1',
     description='Extended version of music macro language which generates MML and NSF files for Nintendo music composing',
     author='Craig Campbell',
     author_email='iamcraigcampbell@gmail.com',

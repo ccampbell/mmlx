@@ -20,6 +20,7 @@ class Listener(object):
     def __init__(self, logger=None):
         self.watching = False
         self.callback = None
+        self.first_run = True
         self.file_list = {}
         self.logger = logger
 
@@ -67,6 +68,10 @@ class Listener(object):
                     self.logger.log(self.logger.color("detected change to: ", self.logger.GRAY) + self.logger.color(file, self.logger.UNDERLINE))
                     self.file_list[file] = last_changed
                     self.callback(file, output_file, True)
+
+            if self.first_run:
+                self.logger.log('')
+                self.first_run = False
 
         except Exception:
             self.logger.log(self.logger.color('Sorry, an error occured:\n', self.logger.RED))

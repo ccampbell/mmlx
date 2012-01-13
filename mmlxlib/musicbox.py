@@ -97,6 +97,9 @@ class MusicBox(object):
         listener = Listener(self.logger)
         listener.onChange(self.processFile)
 
+        if os.path.isdir(options['start']) and not os.path.isdir(options['end']):
+            os.mkdir(options['end'])
+
         if self.options['listen']:
             listener.watch(options['start'], options['end'])
         else:
@@ -200,5 +203,6 @@ class MusicBox(object):
         if not self.options['create_mml']:
             Util.removeFile(output)
 
-        self.logger.log("")
+        if open_file:
+            self.logger.log("")
 

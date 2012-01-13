@@ -35,14 +35,13 @@ class MusicBox(object):
             'end': None
         }
 
-        # valid_args = ['--verbose', '--help', '--watch', '--open-nsf', '--create-nsf', '--create-mml']
+        if '--help' in args:
+            return self.showUsage()
 
         try:
             for key,arg in enumerate(args):
                 if arg == '--verbose':
                     options['verbose'] = True
-                elif arg == '--help':
-                    self.showUsage()
                 elif arg == '--open-nsf':
                     options['open_nsf'] = True
                 elif arg == '--create-nsf':

@@ -31,6 +31,10 @@ class Util(object):
         file.close()
 
     @staticmethod
+    def removeFile(path):
+        os.unlink(path)
+
+    @staticmethod
     def sortDictionary(dictionary):
         return sorted(dictionary.iteritems(), key=operator.itemgetter(1))
 

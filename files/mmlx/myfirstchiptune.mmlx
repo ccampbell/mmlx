@@ -23,7 +23,7 @@ bass:
     vibrato: 2 4 4
 
 drum:
-    volume:  10 8 6 4 2 0
+    volume: 10 8 6 4 2 0
     q: 4
 
 ABCD t110

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>name</key>
+	<string>Completions</string>
+	<key>scope</key>
+	<string>source.mmlx</string>
+	<key>settings</key>
+	<dict>
+		<key>completions</key>
+		<array>
+			<string>adsr</string>
+			<string>volume</string>
+			<string>max_volume</string>
+			<string>vibrato</string>
+			<string>pitch</string>
+			<string>timbre</string>
+			<string>extends</string>
+			<string>import</string>
+			<string>ABSOLUTE</string>
+			<string>NOTES</string>
+			<string>COUNTER</string>
+			<string>TRANSPOSE</string>
+			<string>TITLE</string>
+			<string>COMPOSER</string>
+			<string>PROGRAMER</string>
+			<string>MAKER</string>
+			<string>OCTAVE</string>
+			<string>REV</string>
+			<string>EX</string>
+			<string>DISKFM</string>
+			<string>NAMCO106</string>
+			<string>VRC6</string>
+			<string>VRC7</string>
+			<string>MMC5</string>
+			<string>FME7</string>
+			<string>BANK</string>
+			<string>CHANGE</string>
+			<string>EFFECT</string>
+			<string>INCLUDE</string>
+			<string>BANKSWITCH</string>
+			<string>SETBANK</string>
+			<string>DPCM</string>
+			<string>RESTSTOP</string>
+		</array>
+	</dict>
+	<key>uuid</key>
+	<string>3DA3675F-3AE5-485E-B116-7AD854AE7817</string>
+</dict>
+</plist>

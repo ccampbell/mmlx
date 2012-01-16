@@ -7,10 +7,10 @@ It is short for MML eXtended. Everything written in MML is valid in MMLX, but th
 
 If you are familiar with web programming, MMLX is to MML what SASS is to CSS
 
-For a getting started tutorial check out:
+For a getting started tutorial check out:  
 https://github.com/ccampbell/mmlx/wiki/Getting-Started
 
-For complete documentation:
+For complete documentation:  
 https://github.com/ccampbell/mmlx/wiki/Documentation
 
 You can check out some samples in the files/mmlx directory of this repository.  Also an MML beginner's guide is available at:

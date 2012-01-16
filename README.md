@@ -7,8 +7,11 @@ It is short for MML eXtended. Everything written in MML is valid in MMLX, but th
 
 If you are familiar with web programming, MMLX is to MML what SASS is to CSS
 
-For a getting started tutorial check out:  
+For a getting started tutorial check out:
 https://github.com/ccampbell/mmlx/wiki/Getting-Started
+
+For complete documentation:
+https://github.com/ccampbell/mmlx/wiki/Documentation
 
 You can check out some samples in the files/mmlx directory of this repository.  Also an MML beginner's guide is available at:
 http://nullsleep.com/treasure/mck_guide/
@@ -47,9 +50,9 @@ for additional options run
 
 ## To-Do
 * Throw proper warnings/errors/syntax checks when code is not valid mmlx
-* Documentation
 * Unit tests
 * Automatic DPCM sample conversions from wav files
 * Ability to create random instruments
 * Ability to use absolute paths to directories
 * Ability to generate separate NSF files for different voices
+* Skip over existing macros defined in your MMLX file when generating new macros from instruments

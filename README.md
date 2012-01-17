@@ -28,13 +28,19 @@ http://nullsleep.com/treasure/mck_guide/
 
 this may have to be run as root
 
-## Quick start
-    pip install https://github.com/ccampbell/mmlx/zipball/master
+## Quick start (stable release)
+    pip install https://github.com/ccampbell/mmlx/zipball/1.0.1
     mmlx --watch path/to/mmlx
 
 for additional options run
 
     mmlx --help
+
+### Dev version
+
+If you want to try the latest greatest you can install the dev version
+
+    pip install https://github.com/ccampbell/mmlx/zipball/master
 
 *NOTE: MMLX has only been tested on Python 2.6.1 using Mac OS X at this time*
 
@@ -47,6 +53,7 @@ for additional options run
 * transpose to any key
 * target notes directly by octave without having to manually move up and down octaves
 * auto generate NSF files on save and open them
+* generate separate NSF files for each voice
 
 ## To-Do
 * Throw proper warnings/errors/syntax checks when code is not valid mmlx
@@ -54,5 +61,4 @@ for additional options run
 * Automatic DPCM sample conversions from wav files
 * Ability to create random instruments
 * Ability to use absolute paths to directories
-* Ability to generate separate NSF files for different voices
 * Skip over existing macros defined in your MMLX file when generating new macros from instruments

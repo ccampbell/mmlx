@@ -32,6 +32,10 @@ class WarpWhistle(object):
     COUNTER = 'X-COUNTER'
 
     def __init__(self, content, logger, options):
+        self.first_run = True
+        self.process_voice = None
+        self.voices = None
+        self.ignore = False
         self.content = content
         self.logger = logger
         self.options = options
@@ -416,6 +420,27 @@ class WarpWhistle(object):
         if not word:
             return word
 
+        # matches a voice declaration
+        if re.match(r'[A-Z]{1,}$', word):
+            self.current_voices = list(word)
+
+            # processing everything, keep going
+            if self.process_voice is None:
+                return word
+            
+            # if we are processing a specific voice
+            # and we are on that voice
+            if self.process_voice in self.current_voices:
+                self.ignore = False
+                return self.process_voice
+            
+            # if we are processing a specific voice and we are not on that voice
+            self.ignore = True
+            return ""
+
+        if self.ignore:
+            return ""
+
         # slides for portamento
         match = re.match(r'^\/([0-9]+)?$', word)
         if match:
@@ -429,11 +454,6 @@ class WarpWhistle(object):
             self.setDataForVoices(self.current_voices, WarpWhistle.SLIDE, {'note': prev_note, 'octave': start_octave, 'speed': match.group(1)})
 
             return ''
-
-        # matches a voice declaration
-        if re.match(r'[A-Z]{1,}$', word):
-            self.current_voices = list(word)
-            return word
 
         # matches a tempo declaration
         if re.match(r't\d+$', word):
@@ -651,6 +671,18 @@ class WarpWhistle(object):
             new_words.append(self.processWord(word, next_word, prev_word))
 
         return ' '.join(new_words)
+    
+    def findVoices(self, content):
+        matches = re.findall(r'^([A-Z]{1,}) ', content, re.MULTILINE)
+
+        voices = []
+        for match in matches:
+            new_voices = list(match)
+            for voice in new_voices:
+                if not voice in voices:
+                    voices.append(voice)
+        
+        return voices
 
     def process(self, content):
         self.logger.log('- stripping comments', True)
@@ -674,6 +706,19 @@ class WarpWhistle(object):
         self.logger.log('- collapsing spaces', True)
         content = self.collapseSpaces(content)
 
+        if not self.first_run:
+            if self.voices is None and self.options['separate_voices']:
+                self.voices = self.findVoices(content)
+            
+            if self.voices is None:
+                self.voices = []
+
+            if len(self.voices):
+                self.process_voice = self.voices.pop(0)
+            
+        if self.process_voice:
+            self.logger.log('processing voice: ' + self.process_voice, True)
+
         lines = content.split('\n')
         new_lines = []
         for line in lines:
@@ -694,7 +739,14 @@ class WarpWhistle(object):
         self.logger.log('- removing blank lines', True)
         content = self.removeBlankLines(content)
 
+        self.first_run = False
+
         return content
 
+    def isPlaying(self):
+        return self.voices is None or len(self.voices) != 0
+
     def play(self):
-        return self.process(self.content)
+        self.ignore = False
+        self.reset()
+        return (self.process(self.content), self.process_voice)

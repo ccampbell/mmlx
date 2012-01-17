@@ -31,6 +31,7 @@ class MusicBox(object):
             'local': local,
             'create_nsf': True,
             'create_mml': False,
+            'separate_voices': False,
             'start': None,
             'end': None
         }
@@ -44,6 +45,8 @@ class MusicBox(object):
                     options['verbose'] = True
                 elif arg == '--open-nsf':
                     options['open_nsf'] = True
+                elif arg == '--explode':
+                    options['separate_voices'] = True
                 elif arg == '--create-nsf':
                     value = args[key + 1]
                     del(args[key + 1])
@@ -190,8 +193,21 @@ class MusicBox(object):
 
         whistle = WarpWhistle(content, self.logger, self.options)
         whistle.import_directory = os.path.dirname(input)
-        content = whistle.play()
 
+        while whistle.isPlaying():
+            open_file = open_file and whistle.first_run
+
+            song = whistle.play()
+
+            new_output = output
+            if song[1] is not None:
+                new_output = new_output.replace('.mml', '_' + song[1] + '.mml') 
+
+            self.handleProcessedFile(song[0], new_output, open_file)
+        
+        self.logger.log("")
+    
+    def handleProcessedFile(self, content, output, open_file = False):
         if self.options['create_mml']:
             self.logger.log('generating file: ' + self.logger.color(output, self.logger.YELLOW))
 
@@ -205,4 +221,3 @@ class MusicBox(object):
 
         if open_file:
             self.logger.log("")
-

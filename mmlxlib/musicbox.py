@@ -45,7 +45,7 @@ class MusicBox(object):
                     options['verbose'] = True
                 elif arg == '--open-nsf':
                     options['open_nsf'] = True
-                elif arg == '--explode':
+                elif arg == '--bob-omb':
                     options['separate_voices'] = True
                 elif arg == '--create-nsf':
                     value = args[key + 1]
@@ -128,6 +128,7 @@ class MusicBox(object):
         logger.log(logger.color('--help', logger.WHITE) + '                                shows help dialogue')
         logger.log(logger.color('--verbose', logger.WHITE) + '                             shows verbose output')
         logger.log(logger.color('--open-nsf', logger.WHITE) + '                            opens nsf file on save')
+        logger.log(logger.color('--bob-omb', logger.WHITE) + '                             generates a separate NSF file for each voice')
         logger.log(logger.color('--create-mml ' + logger.color('0', logger.YELLOW), logger.WHITE) +'                        creates an MML file on save (defaults to 0)')
         logger.log(logger.color('--create-nsf ' + logger.color('1', logger.YELLOW), logger.WHITE) +'                        creates an NSF file on save (defaults to 1)')
         logger.log(logger.color('--watch', logger.WHITE) + logger.color(' path/to/mmlx', logger.YELLOW) + logger.color(':', logger.GRAY) + logger.color('path/to/mml', logger.YELLOW) + '      watches for changes in first directory and compiles to second')

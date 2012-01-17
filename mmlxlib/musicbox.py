@@ -206,7 +206,8 @@ class MusicBox(object):
 
             self.handleProcessedFile(song[0], new_output, open_file)
         
-        self.logger.log("")
+        if self.options['separate_voices']:
+            self.logger.log("")
     
     def handleProcessedFile(self, content, output, open_file = False):
         if self.options['create_mml']:

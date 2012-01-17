@@ -35,7 +35,6 @@ class WarpWhistle(object):
         self.first_run = True
         self.process_voice = None
         self.voices = None
-        self.ignore = False
         self.content = content
         self.logger = logger
         self.options = options
@@ -655,6 +654,8 @@ class WarpWhistle(object):
         return word
 
     def processLine(self, line):
+        self.ignore = False
+
         words = line.split(' ')
         new_words = []
 
@@ -707,12 +708,9 @@ class WarpWhistle(object):
         content = self.collapseSpaces(content)
 
         if not self.first_run:
-            if self.voices is None and self.options['separate_voices']:
+            if self.voices is None:
                 self.voices = self.findVoices(content)
             
-            if self.voices is None:
-                self.voices = []
-
             if len(self.voices):
                 self.process_voice = self.voices.pop(0)
             
@@ -744,9 +742,16 @@ class WarpWhistle(object):
         return content
 
     def isPlaying(self):
-        return self.voices is None or len(self.voices) != 0
+        if self.first_run:
+            return True
+
+        if not self.options['separate_voices']:
+            return False
+        
+        return len(self.voices) != 0
 
     def play(self):
-        self.ignore = False
+        counter = self.getGlobalVar(WarpWhistle.COUNTER) or 0
+        Instrument.reset(counter)
         self.reset()
         return (self.process(self.content), self.process_voice)

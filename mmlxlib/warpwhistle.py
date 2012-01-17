@@ -748,7 +748,7 @@ class WarpWhistle(object):
         if not self.options['separate_voices']:
             return False
         
-        return len(self.voices) != 0
+        return self.voices is None or len(self.voices) != 0
 
     def play(self):
         counter = self.getGlobalVar(WarpWhistle.COUNTER) or 0

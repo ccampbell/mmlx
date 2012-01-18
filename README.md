@@ -61,4 +61,5 @@ If you want to try the latest greatest you can install the dev version
 * Automatic DPCM sample conversions from wav files
 * Ability to create random instruments
 * Ability to use absolute paths to directories
+* Add improved support for expansion packs (VRC7, VRC6, N106, etc)
 * Skip over existing macros defined in your MMLX file when generating new macros from instruments

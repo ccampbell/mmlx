@@ -1,0 +1,30 @@
+#TITLE N106 Demo
+#COMPOSER Craig Campbell
+#PROGRAMER Craig Campbell
+
+/**
+ * You can use the X-TEMPO declaration if you don't know all the voice names
+ * that will end up in your final document (for example if using expansion chips)
+ */
+#X-TEMPO 130
+
+/**
+ * instruments
+ */
+square:
+    volume: 10
+    chip: N106
+    waveform: 15 15 15 15 0 0 0 0 
+
+sawtooth:
+    volume: 15
+    chip: N106
+    waveform: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+    buffer: 1
+      
+soft:
+    volume: 6
+
+N106-A o2 @square a > c e a e c e g < a > c e a g d < b g f a > c f e < b g+ e a1
+N106-B o1 l8 @sawtooth [a > a]4 [c > c]4 << [a > a]4 < [g > g]4 < [f > f]4 < [e > e]4 < a1
+N106-C o4 @square +@soft r1 c c c e r1 < b g g b r1^1 c1

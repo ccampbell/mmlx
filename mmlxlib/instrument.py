@@ -24,6 +24,9 @@ class Instrument(object):
 
         if hasattr(self, "adsr"):
             self.volume = self.getVolumeFromADSR(self.adsr)
+        
+        if self.getChip() == 'N106':
+            Instrument.N106_buffers[self.waveform] = int(self.buffer) if hasattr(self, 'buffer') else None
 
     # attack - time taken for amplitude to rise from 0 to max (15)
     # decay - time taken for amplitude to drop to sustain level
@@ -88,6 +91,12 @@ class Instrument(object):
         # print values
         return values
 
+    def getChip(self):
+        if hasattr(self, 'chip'):
+            return self.chip
+        
+        return None
+        
     @staticmethod
     def reset(counter = 0):
         counter = int(counter)
@@ -97,7 +106,8 @@ class Instrument(object):
             'volume': counter,
             'pitch': counter,
             'arpeggio': counter,
-            'vibrato': counter
+            'vibrato': counter,
+            'N106': counter
         }
 
         Instrument.timbres = {}
@@ -105,6 +115,8 @@ class Instrument(object):
         Instrument.pitches = {}
         Instrument.arpeggios = {}
         Instrument.vibratos = {}
+        Instrument.N106 = {}
+        Instrument.N106_buffers = {}
 
     def hasParent(self):
         return hasattr(self, 'extends') and self.extends is not None
@@ -150,10 +162,15 @@ class Instrument(object):
         i = Instrument.vibratos[self.vibrato] if self.vibrato in Instrument.vibratos else self.getCountFor('vibrato')
         Instrument.vibratos[self.vibrato] = i
         return 'MP' + str(i)
+    
+    def getN106Macro(self):
+        i = Instrument.N106[self.waveform] if self.waveform in Instrument.N106 else self.getCountFor('N106')
+        Instrument.N106[self.waveform] = i
+        return '@@' + str(i)
 
     @staticmethod
     def hasBeenUsed():
-        macros = ["timbres", "volumes", "pitches", "arpeggios", "vibratos"]
+        macros = ["timbres", "volumes", "pitches", "arpeggios", "vibratos", "N106"]
         for macro in macros:
             if len(getattr(Instrument, macro)) > 0:
                 return True
@@ -183,8 +200,52 @@ class Instrument(object):
         # render vibratos
         for vibrato in Util.sortDictionary(Instrument.vibratos):
             macros += '@MP' + str(vibrato[1]) + ' = { ' + vibrato[0] + ' }\n'
+        
+        # render N106
+        for macro in Util.sortDictionary(Instrument.N106):
+            macros += '@N' + str(macro[1]) + ' = { ' + Instrument.getN106Buffer(macro[0]) + ', ' + macro[0] + ' }\n'
 
         return macros
+    
+    @staticmethod
+    def maxBufferFromSampleLength(sample_length):
+        map = {
+            32: 3,
+            28: 3,
+            24: 4,
+            20: 5,
+            16: 7,
+            12: 9,
+             8: 13,
+             4: 32
+        }
+
+        return map[sample_length]
+
+    @staticmethod
+    def getBufferForWaveform(waveform):
+        return Instrument.N106_buffers[waveform]
+
+    @staticmethod
+    def getN106Buffer(waveform):
+        waveform = waveform.strip()
+        bits = waveform.split(' ')
+        if len(bits) % 4 != 0:
+            raise Exception('N106 waveform samples have to be a multiple of 4')
+            
+        max_allowed_buffer = Instrument.maxBufferFromSampleLength(len(bits))
+        buffer = Instrument.getBufferForWaveform(waveform)
+                
+        if buffer is None:
+            return '00'
+
+        if buffer > max_allowed_buffer:
+            raise Exception('buffer value cannot be greater than: ' + str(max_allowed_buffer) + ' for ' + str(len(bits)) + ' samples')
+        
+        if buffer < 10:
+            buffer = '0' + str(buffer)
+        
+        return str(buffer)
 
     def start(self, whistle):
         start = ''
@@ -235,6 +296,14 @@ class Instrument(object):
             if new_q != last_q:
                 whistle.setDataForVoices(whistle.current_voices, 'q', new_q)
                 start += new_q + ' '
+        
+        if hasattr(self, 'waveform'):
+            last_n106 = whistle.getDataForVoice(whistle.current_voices[0], 'timbre')
+            new_n106 = self.getN106Macro()
+
+            if new_n106 != last_n106:
+                whistle.setDataForVoices(whistle.current_voices, 'timbre', new_n106)
+                start += new_n106 + ' '
 
         return start
 

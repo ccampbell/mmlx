@@ -19,7 +19,12 @@ import math
 class Instrument(object):
 
     def __init__(self, data):
+        valid_chips = ['N106']
+
         for key in data:
+            if key == 'chip' and data[key] not in valid_chips:
+                raise Exception('value for chip is not valid: ' + data[key])
+
             setattr(self, key, data[key])
 
         if hasattr(self, "adsr"):

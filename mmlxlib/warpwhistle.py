@@ -611,7 +611,7 @@ class WarpWhistle(object):
 
             return new_word
 
-        # rewrite special voices for mmlx such as c4 or G+/4^8
+        # rewrite special voices for mmlx such as c4 or G+,4^8
         # to use this put the line X-ABSOLUTE-NOTES at the top of your mmlx file
         match = re.match(r'(\[+)?([A-Ga-g]{1})(\+|\-)?(\d{1,2})?(,(\d+\.?)(\^[0-9\^]+)?)?([\]\d]+)?$', word)
         if match and self.getGlobalVar(WarpWhistle.ABSOLUTE_NOTES):
@@ -710,6 +710,18 @@ class WarpWhistle(object):
                 return word
 
             new_instrument = self.instruments[match.group(3)]
+
+            chip = new_instrument.getChip()
+            diff = []
+            if chip == WarpWhistle.CHIP_N106:
+                diff = Util.arrayDiff(self.current_voices, self.getVoicesForChip(WarpWhistle.CHIP_N106).values())
+                # diff = set(self.current_voices) - set(self.getVoicesForChip(WarpWhistle.CHIP_N106).values())
+            
+            if len(diff):
+                diff.sort()
+                words = ('voice', 'does') if len(diff) == 1 else ('voices', 'do')
+                raise Exception(words[0] + ' ' + ', '.join(diff) + ' ' + words[1] + ' not support instruments using chip: ' + chip)
+
             active_instruments = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
 
             if active_instruments is None:

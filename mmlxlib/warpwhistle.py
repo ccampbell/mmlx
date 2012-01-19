@@ -303,12 +303,16 @@ class WarpWhistle(object):
                 n106_count = 8
             
             if not 'EX-NAMCO106' in self.global_vars:
-                content = self.addToMml(content, '#EX-NAMCO106 ' + str(n106_count) + '\n')
+                content = self.addToMml(content, '#EX-NAMCO106 ' + str(n106_count) + '\n', True)
 
         return content
 
-    def addToMml(self, content, string):
+    def addToMml(self, content, string, is_global_line = False):
         last_global_declaration = self.global_lines[-1]
+        
+        if is_global_line:
+            self.global_lines.append(string)
+            
         return content.replace(last_global_declaration, last_global_declaration + string)
 
     def replaceVariables(self, content):
@@ -799,6 +803,8 @@ class WarpWhistle(object):
         self.voices = self.findVoices(content)
         content = self.renderTempo(content)
 
+        content = self.renderExpansionChips(content)
+
         if not self.first_run:
             if self.voices_to_process is None:
                 self.voices_to_process = self.voices
@@ -817,7 +823,6 @@ class WarpWhistle(object):
         content = '\n'.join(new_lines)
 
         content = self.renderInstruments(content)
-        content = self.renderExpansionChips(content)
 
         self.logger.log('- replacing unneccessary octave shifts', True)
         levels = math.ceil(abs(float(self.getGlobalVar(WarpWhistle.TRANSPOSE))) / float(12))

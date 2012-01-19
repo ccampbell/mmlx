@@ -18,6 +18,18 @@ import operator, os
 class Util(object):
 
     @staticmethod
+    def arrayDiff(list1, list2):
+        if type(list1) is dict:
+            list1 = list1.values()
+        
+        if type(list2) is dict:
+            list2 = list2.values()
+        
+        diff = set(list1) - set(list2)
+        
+        return list(diff)
+
+    @staticmethod
     def openFile(path):
         file = open(path, "r")
         content = file.read()

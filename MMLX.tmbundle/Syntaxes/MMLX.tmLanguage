@@ -68,7 +68,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>^#(TITLE|COMPOSER|PROGRAMER|MAKER|OCTAVE-REV|EX-DISKFM|EX-NAMCO106|EX-VRC6|EX-VRC7|EX-MMC5|EX-FME7|BANK-CHANGE|EFFECT-INCLUDE|NO-BANKSWITCH|SETBANK|DPCM-RESTSTOP|X-ABSOLUTE-NOTES|X-TRANSPOSE|X-COUNTER)\b</string>
+			<string>^#(TITLE|COMPOSER|PROGRAMER|MAKER|OCTAVE-REV|EX-DISKFM|EX-NAMCO106|EX-VRC6|EX-VRC7|EX-MMC5|EX-FME7|BANK-CHANGE|EFFECT-INCLUDE|NO-BANKSWITCH|SETBANK|DPCM-RESTSTOP|X-ABSOLUTE-NOTES|X-TRANSPOSE|X-COUNTER|X-TEMPO)\b</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>0</key>
@@ -131,7 +131,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>( |\]|\:)([0-9]+)</string>
+			<string>( |\]|\:|\|)([0-9]+)</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>2</key>
@@ -145,7 +145,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>( |\:)(-)([0-9]+)</string>
+			<string>( |\:|\|)(-)([0-9]+)</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>2</key>
@@ -190,7 +190,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q): {0,}(-)?([0-9]+)?</string>
+			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}(-)?([0-9]+)?(N106$)?</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
@@ -208,9 +208,20 @@
 					<key>name</key>
 					<string>constant</string>
 				</dict>
+				<key>4</key>
+				<dict>
+					<key>name</key>
+					<string>constant</string>
+				</dict>
 			</dict>
 			<key>end</key>
 			<string>\b</string>
+		</dict>
+		<dict>
+			<key>match</key>
+			<string>(N106)-([A-Z]+)\b</string>
+			<key>name</key>
+			<string>keyword.mml.voice</string>
 		</dict>
 	</array>
 	<key>scopeName</key>

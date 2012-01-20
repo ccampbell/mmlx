@@ -427,12 +427,9 @@ class WarpWhistle(object):
         return shift[number]
 
     def slide(self, start_data, end_data):
-        print start_data
-        print end_data
-
         N106_channels = self.getGlobalVar(WarpWhistle.N106)
         shift = 0
-        if len(N106_channels):
+        if N106_channels is not None and len(N106_channels):
             active_instruments = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
             waveform = None
             for instrument in active_instruments:

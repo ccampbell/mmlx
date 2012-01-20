@@ -32,6 +32,9 @@ class WarpWhistle(object):
     TRANSPOSE = 'X-TRANSPOSE'
     COUNTER = 'X-COUNTER'
     X_TEMPO = 'X-TEMPO'
+    SMOOTH = 'X-SMOOTH'
+    N106 = 'EX-NAMCO106'
+    PITCH_CORRECTION = 'PITCH-CORRECTION'
     
     CHIP_N106 = 'N106'
 
@@ -302,8 +305,13 @@ class WarpWhistle(object):
             if n106_count in [5, 6, 7]:
                 n106_count = 8
             
-            if not 'EX-NAMCO106' in self.global_vars:
-                content = self.addToMml(content, '#EX-NAMCO106 ' + str(n106_count) + '\n', True)
+            if not WarpWhistle.N106 in self.global_vars:
+                self.global_vars[WarpWhistle.N106] = str(n106_count)
+                content = self.addToMml(content, '#' + WarpWhistle.N106 + ' ' + str(n106_count) + '\n', True)
+            
+            if not WarpWhistle.PITCH_CORRECTION in self.global_vars:
+                self.global_vars[WarpWhistle.PITCH_CORRECTION] = True
+                content = self.addToMml(content, '#' + WarpWhistle.PITCH_CORRECTION + '\n', True)
 
         return content
 
@@ -399,14 +407,48 @@ class WarpWhistle(object):
         frequency = frequencies[index] >> (octave - 2)
         return frequency
 
+    def calculateN106OctaveShift(self, channel_count, waveform):
+        if waveform is None:
+            return 0
+
+        # my math skills are so lacking these days this is the number of octaves to shift
+        # based on the waveform sample count and the channel count
+        shift = {
+            4: 4,
+            8: 3,
+            16: 2,
+            32: 1,
+            64: 0,
+            128: -1,
+            256: -2
+        }
+
+        number = channel_count * len(waveform.strip().split(' '))
+        return shift[number]
+
     def slide(self, start_data, end_data):
+        print start_data
+        print end_data
+
+        N106_channels = self.getGlobalVar(WarpWhistle.N106)
+        shift = 0
+        if len(N106_channels):
+            active_instruments = self.getDataForVoice(self.current_voices[0], WarpWhistle.INSTRUMENT)
+            waveform = None
+            for instrument in active_instruments:
+                if hasattr(instrument, 'waveform'):
+                    waveform = instrument.waveform
+                    break
+
+            shift = self.calculateN106OctaveShift(int(N106_channels), waveform)
+        
         match = re.match(r'^(\[+)?([a-g](\+|\-)?)(.*)$', start_data['note'])
         start_data['note'] = match.group(2)
         start_data['append'] = match.group(4)
 
         # total amount we need to move
-        slide_amount = self.getFrequency(start_data['note'], start_data['octave']) - self.getFrequency(end_data['note'], end_data['octave'])
-
+        slide_amount = self.getFrequency(start_data['note'], start_data['octave'] + shift) - self.getFrequency(end_data['note'], end_data['octave'] + shift)
+                
         # song tempo
         tempo = self.getDataForVoice(self.current_voices[0], WarpWhistle.TEMPO)
 
@@ -467,7 +509,18 @@ class WarpWhistle(object):
 
         octave_diff = start_data['octave'] - end_data['octave']
 
-        return self.getOctaveShift(octave_diff) + ' ' + macro + ' ' + start_data['note'] + append_before + ' EPOF' + append_after + ' ' + self.getOctaveShift(-octave_diff)
+        diff = Util.arrayDiff(self.current_voices, ['A', 'B', 'C'])
+
+        smooth_start = ''
+        smooth_end = ''
+        if len(diff) == 0:
+            smooth = self.getGlobalVar(WarpWhistle.SMOOTH)
+        
+            if smooth:
+                smooth_start = ' SM '
+                smooth_end = ' SMOF'
+
+        return self.getOctaveShift(octave_diff) + smooth_start + macro + ' ' + start_data['note'] + append_before + ' EPOF' + smooth_end + append_after + ' ' + self.getOctaveShift(-octave_diff)
 
     def getOctaveShift(self, ticks):
         char = '<' if ticks < 0 else '>'
@@ -509,8 +562,16 @@ class WarpWhistle(object):
         if not word:
             return word
 
+        valid_commands = ['EPOF', 'ENOF', 'MPOF', 'PS', 'SDQR', 'SDOF', 'MHOF', 'SM', 'SMOF', 'EHOF']
+        if word in valid_commands:
+            if self.ignore:
+                return ""
+            
+            return word
+        
         # matches a voice declaration
         if re.match(r'[A-Z]{1,}$', word):
+            
             self.current_voices = list(word)
 
             # processing everything, keep going
@@ -713,9 +774,8 @@ class WarpWhistle(object):
 
             chip = new_instrument.getChip()
             diff = []
-            if chip == WarpWhistle.CHIP_N106:
-                diff = Util.arrayDiff(self.current_voices, self.getVoicesForChip(WarpWhistle.CHIP_N106).values())
-                # diff = set(self.current_voices) - set(self.getVoicesForChip(WarpWhistle.CHIP_N106).values())
+            if chip is not None:
+                diff = Util.arrayDiff(self.current_voices, self.getVoicesForChip(chip).values())
             
             if len(diff):
                 diff.sort()

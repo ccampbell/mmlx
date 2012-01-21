@@ -19,7 +19,7 @@ import math
 class Instrument(object):
 
     def __init__(self, data):
-        valid_chips = ['N106']
+        valid_chips = ['N106', 'FDS']
 
         for key in data:
             if key == 'chip' and data[key] not in valid_chips:
@@ -112,7 +112,8 @@ class Instrument(object):
             'pitch': counter,
             'arpeggio': counter,
             'vibrato': counter,
-            'N106': counter
+            'N106': counter,
+            'FDS': counter
         }
 
         Instrument.timbres = {}
@@ -122,6 +123,7 @@ class Instrument(object):
         Instrument.vibratos = {}
         Instrument.N106 = {}
         Instrument.N106_buffers = {}
+        Instrument.FDS = {}
 
     def hasParent(self):
         return hasattr(self, 'extends') and self.extends is not None
@@ -172,10 +174,16 @@ class Instrument(object):
         i = Instrument.N106[self.waveform] if self.waveform in Instrument.N106 else self.getCountFor('N106')
         Instrument.N106[self.waveform] = i
         return '@@' + str(i)
+    
+    def getFDSMacro(self):
+        i = Instrument.FDS[self.waveform] if self.waveform in Instrument.FDS else self.getCountFor('FDS')
+        Instrument.FDS[self.waveform] = i
+        return '@@' + str(i)
+        
 
     @staticmethod
     def hasBeenUsed():
-        macros = ["timbres", "volumes", "pitches", "arpeggios", "vibratos", "N106"]
+        macros = ["timbres", "volumes", "pitches", "arpeggios", "vibratos", "N106", "FDS"]
         for macro in macros:
             if len(getattr(Instrument, macro)) > 0:
                 return True
@@ -208,9 +216,46 @@ class Instrument(object):
         
         # render N106
         for macro in Util.sortDictionary(Instrument.N106):
-            macros += '@N' + str(macro[1]) + ' = { ' + Instrument.getN106Buffer(macro[0]) + ', ' + macro[0] + ' }\n'
+            waveform = Instrument.validateN106(macro[0])
+            macros += '@N' + str(macro[1]) + ' = { ' + Instrument.getN106Buffer(waveform) + ', ' + waveform + ' }\n'
+
+        # render FDS
+        for macro in Util.sortDictionary(Instrument.FDS):
+            macros += '@FM' + str(macro[1]) + ' = { ' + Instrument.validateFds(macro[0]) + ' }\n'
 
         return macros
+        
+    @staticmethod
+    def validateN106(macro):
+        bits = macro.strip().split(' ')
+        if len(bits) % 4 != 0:
+            raise Exception('N106 waveform samples have to be a multiple of 4')
+        
+        for bit in bits:
+            bit = int(bit.replace('$', ''), 16) if bit.startswith('$') else int(bit)
+            if bit < 0:
+                raise Exception('N106 waveform parameter cannot be less than 0')
+
+            if bit > 15:
+                raise Exception('N106 waveform parameter cannot be greater than 15')
+        
+        return macro
+        
+    @staticmethod
+    def validateFds(macro):
+        bits = macro.strip().split(' ')
+        if len(bits) != 64:
+            raise Exception('FDS waveform must have exactly 64 parameters')
+        
+        for bit in bits:
+            bit = int(bit)
+            if bit < 0:
+                raise Exception('FDS waveform parameter cannot be less than 0')
+            
+            if bit > 63:
+                raise Exception('FDS waveform parameter cannot be greater than 63')
+        
+        return macro
     
     @staticmethod
     def maxBufferFromSampleLength(sample_length):
@@ -235,8 +280,6 @@ class Instrument(object):
     def getN106Buffer(waveform):
         waveform = waveform.strip()
         bits = waveform.split(' ')
-        if len(bits) % 4 != 0:
-            raise Exception('N106 waveform samples have to be a multiple of 4')
             
         max_allowed_buffer = Instrument.maxBufferFromSampleLength(len(bits))
         buffer = Instrument.getBufferForWaveform(waveform)
@@ -302,13 +345,21 @@ class Instrument(object):
                 whistle.setDataForVoices(whistle.current_voices, 'q', new_q)
                 start += new_q + ' '
         
-        if hasattr(self, 'waveform'):
+        if hasattr(self, 'waveform') and self.getChip() == 'N106':
             last_n106 = whistle.getDataForVoice(whistle.current_voices[0], 'timbre')
             new_n106 = self.getN106Macro()
 
             if new_n106 != last_n106:
                 whistle.setDataForVoices(whistle.current_voices, 'timbre', new_n106)
                 start += new_n106 + ' '
+        
+        if hasattr(self, 'waveform') and self.getChip() == 'FDS':
+            last_fds = whistle.getDataForVoice(whistle.current_voices[0], 'timbre')
+            new_fds = self.getFDSMacro()
+
+            if new_fds != last_fds:
+                whistle.setDataForVoices(whistle.current_voices, 'timbre', new_fds)
+                start += new_fds + ' '
 
         return start
 

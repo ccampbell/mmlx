@@ -34,9 +34,11 @@ class WarpWhistle(object):
     X_TEMPO = 'X-TEMPO'
     SMOOTH = 'X-SMOOTH'
     N106 = 'EX-NAMCO106'
+    FDS = 'EX-DISKFM'
     PITCH_CORRECTION = 'PITCH-CORRECTION'
     
     CHIP_N106 = 'N106'
+    CHIP_FDS = 'FDS'
 
     def __init__(self, content, logger, options):
         self.first_run = True
@@ -244,6 +246,11 @@ class WarpWhistle(object):
                 'G': 'V',
                 'H': 'W'
             }
+        
+        if chip == WarpWhistle.CHIP_FDS:
+            return {
+                'A': 'F'
+            }
     
     def getVoiceTranslation(self, chip, voice):
         voices = self.getVoicesForChip(chip)
@@ -267,7 +274,7 @@ class WarpWhistle(object):
     
     def processExpansionVoices(self, content):
         """finds any special voices (such as N106-AB) and converts them to the proper voice names"""
-        matches = re.findall(r'((N106)-([A-Z]+) )', content)
+        matches = re.findall(r'((N106|FDS)-([A-Z]+) )', content)
         for match in matches:
             content = content.replace(match[0], self.getVoiceFor(match[1], match[2]) + ' ')
 
@@ -287,7 +294,7 @@ class WarpWhistle(object):
         # find the last #BLOCK on the top of the file and render the instruments below it
         return self.addToMml(content, Instrument.render())
 
-    def renderExpansionChips(self, content):
+    def renderN106(self, content):
         n106_voices = self.getVoicesForChip(WarpWhistle.CHIP_N106).values()
         n106_voices.sort()
         
@@ -312,6 +319,31 @@ class WarpWhistle(object):
             if not WarpWhistle.PITCH_CORRECTION in self.global_vars:
                 self.global_vars[WarpWhistle.PITCH_CORRECTION] = True
                 content = self.addToMml(content, '#' + WarpWhistle.PITCH_CORRECTION + '\n', True)
+        
+        return content
+
+    def renderFds(self, content):
+        fds_voices = self.getVoicesForChip(WarpWhistle.CHIP_FDS).values()
+        fds_voices.sort()
+        
+        fds = False
+        for voice in self.voices:
+            if voice in fds_voices:
+                fds = True
+                break
+        
+        if not fds:
+            return content
+        
+        if not WarpWhistle.FDS in self.global_vars:
+            self.global_vars[WarpWhistle.FDS] = True
+            content = self.addToMml(content, '#' + WarpWhistle.FDS + '\n', True)
+            
+        return content
+        
+    def renderExpansionChips(self, content):
+        content = self.renderN106(content)
+        content = self.renderFds(content)
 
         return content
 

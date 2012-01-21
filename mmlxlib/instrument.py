@@ -19,7 +19,7 @@ import math
 class Instrument(object):
 
     def __init__(self, data):
-        valid_chips = ['N106', 'FDS']
+        valid_chips = ['N106', 'FDS', 'VRC6']
 
         for key in data:
             if key == 'chip' and data[key] not in valid_chips:

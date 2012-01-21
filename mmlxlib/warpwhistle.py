@@ -35,10 +35,12 @@ class WarpWhistle(object):
     SMOOTH = 'X-SMOOTH'
     N106 = 'EX-NAMCO106'
     FDS = 'EX-DISKFM'
+    VRC6 = 'EX-VRC6'
     PITCH_CORRECTION = 'PITCH-CORRECTION'
     
     CHIP_N106 = 'N106'
     CHIP_FDS = 'FDS'
+    CHIP_VRC6 = 'VRC6'
 
     def __init__(self, content, logger, options):
         self.first_run = True
@@ -251,6 +253,13 @@ class WarpWhistle(object):
             return {
                 'A': 'F'
             }
+        
+        if chip == WarpWhistle.CHIP_VRC6:
+            return {
+                'A': 'M',
+                'B': 'N',
+                'C': 'O'
+            }
     
     def getVoiceTranslation(self, chip, voice):
         voices = self.getVoicesForChip(chip)
@@ -274,7 +283,7 @@ class WarpWhistle(object):
     
     def processExpansionVoices(self, content):
         """finds any special voices (such as N106-AB) and converts them to the proper voice names"""
-        matches = re.findall(r'((N106|FDS)-([A-Z]+) )', content)
+        matches = re.findall(r'((N106|FDS|VRC6)-([A-Z]+) )', content)
         for match in matches:
             content = content.replace(match[0], self.getVoiceFor(match[1], match[2]) + ' ')
 
@@ -322,28 +331,35 @@ class WarpWhistle(object):
         
         return content
 
-    def renderFds(self, content):
-        fds_voices = self.getVoicesForChip(WarpWhistle.CHIP_FDS).values()
-        fds_voices.sort()
+    def getExpForChip(self, chip):
+        if chip == WarpWhistle.CHIP_N106:
+            return WarpWhistle.N106
+        elif chip == WarpWhistle.CHIP_FDS:
+            return WarpWhistle.FDS
+        elif chip == WarpWhistle.CHIP_VRC6:
+            return WarpWhistle.VRC6
+
+    def renderForChip(self, chip, content):
+        chip_voices = self.getVoicesForChip(chip).values()
+        chip_voices.sort()
         
-        fds = False
+        used = False
         for voice in self.voices:
-            if voice in fds_voices:
-                fds = True
+            if voice in chip_voices:
+                used = True
                 break
         
-        if not fds:
-            return content
-        
-        if not WarpWhistle.FDS in self.global_vars:
-            self.global_vars[WarpWhistle.FDS] = True
-            content = self.addToMml(content, '#' + WarpWhistle.FDS + '\n', True)
+        exp = self.getExpForChip(chip)
+        if used and not exp in self.global_vars:
+            self.global_vars[exp] = True
+            content = self.addToMml(content, '#' + exp + '\n', True)
             
         return content
         
     def renderExpansionChips(self, content):
         content = self.renderN106(content)
-        content = self.renderFds(content)
+        content = self.renderForChip(WarpWhistle.CHIP_FDS, content)
+        content = self.renderForChip(WarpWhistle.CHIP_VRC6, content)
 
         return content
 
@@ -800,6 +816,9 @@ class WarpWhistle(object):
                 return word
 
             new_instrument = self.instruments[match.group(3)]
+            
+            if 'O' in self.current_voices and hasattr(new_instrument, 'timbre'):
+                raise Exception('VRC6 sawtooth (voice O) does not support timbre attribute')
 
             chip = new_instrument.getChip()
             diff = []

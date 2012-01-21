@@ -94,6 +94,12 @@
 		</dict>
 		<dict>
 			<key>match</key>
+			<string>(N106|FDS)-([A-Z]+)\b</string>
+			<key>name</key>
+			<string>keyword.mml.voice</string>
+		</dict>
+		<dict>
+			<key>match</key>
 			<string>[A-Z]+\b</string>
 			<key>name</key>
 			<string>keyword.mml.voice</string>
@@ -190,7 +196,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}(-)?([0-9]+)?(N106$)?</string>
+			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}(-)?([0-9]+)?(N106$|FDS$)?</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>
@@ -216,12 +222,6 @@
 			</dict>
 			<key>end</key>
 			<string>\b</string>
-		</dict>
-		<dict>
-			<key>match</key>
-			<string>(N106)-([A-Z]+)\b</string>
-			<key>name</key>
-			<string>keyword.mml.voice</string>
 		</dict>
 	</array>
 	<key>scopeName</key>

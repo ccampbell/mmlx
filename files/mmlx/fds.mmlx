@@ -1,0 +1,20 @@
+#TITLE FDS Demo
+#COMPOSER Craig Campbell
+#PROGRAMER Craig Campbell
+#X-TEMPO 80
+
+/**
+ * instruments
+ */
+wurlitzer:
+    adsr: 0 10 50 30
+    chip: FDS
+    max_volume: 63
+    waveform: 00 04 21 38 44 50 54 57 51 50 48 54 54 58 60 63 63 63 62 51 56 56 52 54 55 58 58 54 48 42 25 08 04 08 25 42 48 54 58 58 55 54 52 56 56 51 62 63 63 63 60 58 54 54 48 50 51 57 54 50 44 38 21 04
+
+c_major = c e g > c e g
+a_minor = a > c e a > c e
+f_major = f a > c f a > c
+g_major = g b > d g b > d
+
+FDS-A o2 @wurlitzer l16 |: [c_major]4 << [a_minor]4 << [f_major]4 << [g_major]4 :|2

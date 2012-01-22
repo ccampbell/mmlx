@@ -1,0 +1,48 @@
+#TITLE VRC6 Demo
+#COMPOSER Craig Campbell
+#PROGRAMER Craig Campbell
+#X-TEMPO 80
+
+square:
+    volume: 45
+    chip: VRC6
+    timbre: 4
+
+soft: 
+    volume: 40
+
+sawtooth:
+    volume: 50
+    chip: VRC6
+    q: 2
+    
+long:
+    volume: 63
+    q: 4
+
+vibrato:
+    vibrato: 2 4 8
+
+hi-hat:
+    adsr: 0 0 10 5
+    q: 1
+
+snare: 
+    adsr: 0 0 10 10
+    pitch: -15 -15 | 0 1 0
+    q: 8
+
+C o4 |: c2. c2. a2. a2. f2. f2. g2. g2. :|2 c2.
+D l16 [@hi-hat d d d @snare g @hi-hat d d]32
+
+VRC6-A |: o3 @square c /8 e2 g /8 > +@vibrato c2 @square < a. > c. e /8 +@vibrato c2
+VRC6-A @square f /8 > c2 f. < +@vibrato a. < @square g. g. b /8 > +@vibrato d2 :|2
+VRC6-A @square c2.
+
+VRC6-B |: @square +@soft o4 e. c. e. e. c. e. c. a.
+VRC6-B a. a. a. f. b. b. d. b. :|2
+VRC6-B e2.
+
+VRC6-C |: o2 l16 @sawtooth [c c c +@long c @sawtooth c c]4 < [a a a +@long a @sawtooth a a]4
+VRC6-C [f f f +@long f @sawtooth f f]4 [g g g +@long g @sawtooth g g]4 :|2 
+VRC6-C q8 > c2.

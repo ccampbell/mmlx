@@ -1,7 +1,7 @@
 #TITLE VRC6 Demo
 #COMPOSER Craig Campbell
 #PROGRAMER Craig Campbell
-#X-TEMPO 80
+#X-TEMPO 75
 
 square:
     volume: 45

@@ -43,6 +43,12 @@
 			<string>storage.mmlx.instrument</string>
 		</dict>
 		<dict>
+			<key>match</key>
+			<string>@end\b</string>
+			<key>name</key>
+			<string>storage.mmlx.instrument</string>
+		</dict>
+		<dict>
 			<key>begin</key>
 			<string>//</string>
 			<key>end</key>
@@ -94,7 +100,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(N106|FDS)-([A-Z]+)\b</string>
+			<string>(N106|FDS|VRC6|VRC7)-([A-Z]+)\b</string>
 			<key>name</key>
 			<string>keyword.mml.voice</string>
 		</dict>
@@ -196,7 +202,7 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}(-)?([0-9]+)?(N106$|FDS$)?</string>
+			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}\|? {0,}(-)?([0-9]+)?(N106$|FDS$|VRC6$|VRC7$)?</string>
 			<key>beginCaptures</key>
 			<dict>
 				<key>1</key>

@@ -73,18 +73,21 @@
 			<string>comment.block</string>
 		</dict>
 		<dict>
-			<key>begin</key>
-			<string>^#(TITLE|COMPOSER|PROGRAMER|MAKER|OCTAVE-REV|GATE-DENOM|INCLUDE|EX-DISKFM|EX-NAMCO106|EX-VRC6|EX-VRC7|EX-MMC5|EX-FME7|BANK-CHANGE|EFFECT-INCLUDE|NO-BANKSWITCH|AUTO-BANKSWITCH|BANK-CHANGE|SETBANK|DPCM-RESTSTOP|PITCH-CORRECTION|X-ABSOLUTE-NOTES|X-TRANSPOSE|X-COUNTER|X-TEMPO|X-SMOOTH)\b</string>
-			<key>beginCaptures</key>
+			<key>captures</key>
 			<dict>
-				<key>0</key>
+				<key>1</key>
 				<dict>
 					<key>name</key>
 					<string>storage.mml</string>
 				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>variable</string>
+				</dict>
 			</dict>
-			<key>end</key>
-			<string>\n</string>
+			<key>match</key>
+			<string>^(#(TITLE|COMPOSER|PROGRAMER|MAKER|OCTAVE-REV|GATE-DENOM|INCLUDE|EX-DISKFM|EX-NAMCO106|EX-VRC6|EX-VRC7|EX-MMC5|EX-FME7|BANK-CHANGE|EFFECT-INCLUDE|NO-BANKSWITCH|AUTO-BANKSWITCH|BANK-CHANGE|SETBANK|DPCM-RESTSTOP|PITCH-CORRECTION|X-ABSOLUTE-NOTES|X-TRANSPOSE|X-COUNTER|X-TEMPO|X-SMOOTH))\b(.*)\n</string>
 		</dict>
 		<dict>
 			<key>match</key>
@@ -133,6 +136,35 @@
 					<string>constant</string>
 				</dict>
 				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>constant</string>
+				</dict>
+			</dict>
+			<key>end</key>
+			<string>\b</string>
+		</dict>
+		<dict>
+			<key>begin</key>
+			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}\|? {0,}(-)?([0-9]+)?(N106$|FDS$|VRC6$|VRC7$)?</string>
+			<key>beginCaptures</key>
+			<dict>
+				<key>1</key>
+				<dict>
+					<key>name</key>
+					<string>support.function</string>
+				</dict>
+				<key>2</key>
+				<dict>
+					<key>name</key>
+					<string>keyword.operator</string>
+				</dict>
+				<key>3</key>
+				<dict>
+					<key>name</key>
+					<string>constant</string>
+				</dict>
+				<key>4</key>
 				<dict>
 					<key>name</key>
 					<string>constant</string>
@@ -199,35 +231,6 @@
 			</dict>
 			<key>end</key>
 			<string>\n</string>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}\|? {0,}(-)?([0-9]+)?(N106$|FDS$|VRC6$|VRC7$)?</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>1</key>
-				<dict>
-					<key>name</key>
-					<string>support.function</string>
-				</dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>keyword.operator</string>
-				</dict>
-				<key>3</key>
-				<dict>
-					<key>name</key>
-					<string>constant</string>
-				</dict>
-				<key>4</key>
-				<dict>
-					<key>name</key>
-					<string>constant</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>\b</string>
 		</dict>
 	</array>
 	<key>scopeName</key>

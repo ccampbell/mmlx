@@ -7,10 +7,10 @@ It is short for MML eXtended. Everything written in MML is valid in MMLX, but th
 
 If you are familiar with web programming, MMLX is to MML what SASS is to CSS
 
-For a getting started tutorial check out:  
+For a getting started tutorial check out:
 https://github.com/ccampbell/mmlx/wiki/Getting-Started
 
-For complete documentation:  
+For complete documentation:
 https://github.com/ccampbell/mmlx/wiki/Documentation
 
 You can check out some samples in the files/mmlx directory of this repository.  Also an MML beginner's guide is available at:
@@ -29,7 +29,7 @@ http://nullsleep.com/treasure/mck_guide/
 this may have to be run as root
 
 ## Quick start (stable release)
-    pip install https://github.com/ccampbell/mmlx/zipball/1.0.1
+    pip install https://github.com/ccampbell/mmlx/zipball/1.0.2
     mmlx --watch path/to/mmlx
 
 for additional options run
@@ -61,5 +61,5 @@ If you want to try the latest greatest you can install the dev version
 * Automatic DPCM sample conversions from wav files
 * Ability to create random instruments
 * Ability to use absolute paths to directories
-* Add improved support for expansion packs (VRC7, VRC6, N106, etc)
+* Add improved support for expansion packs (VRC7, FME7, etc)
 * Skip over existing macros defined in your MMLX file when generating new macros from instruments

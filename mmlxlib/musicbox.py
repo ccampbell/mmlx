@@ -13,7 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import re, os, subprocess, sys, getopt
+import re, os, subprocess, sys, getopt, shutil
 from warpwhistle import WarpWhistle
 from util import Util
 from instrument import Instrument
@@ -159,6 +159,12 @@ class MusicBox(object):
         nes_include_path = os.path.join(os.path.dirname(__file__), 'nes_include')
         bin_dir = os.path.join(nes_include_path, '../../bin')
 
+        # copy the nes include directory locally so we don't have to deal with permission problems
+        if not self.options['local']:
+            new_nes_include_path = os.path.join(os.path.dirname(path), 'nes_include')
+            shutil.copytree(nes_include_path, new_nes_include_path)
+            nes_include_path = new_nes_include_path
+
         os.environ['NES_INCLUDE'] = nes_include_path
         command = os.path.join(bin_dir, 'ppmckc') if self.options['local'] else 'ppmckc'
         output = subprocess.Popen([command, '-m1', '-i', path], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
@@ -176,12 +182,16 @@ class MusicBox(object):
         if not os.path.isfile(nsf_path):
             os.unlink('define.inc')
             self.logger.log('')
+            if not self.options['local']:
+                shutil.rmtree(nes_include_path)
             raise Exception('failed to create NSF file! Your MML is probably invalid.')
 
         os.rename(nsf_path, path.replace('.mml', '.nsf'))
         os.unlink('define.inc')
         os.unlink('effect.h')
         os.unlink(path.replace('.mml', '.h'))
+        if not self.options['local']:
+            shutil.rmtree(nes_include_path)
 
         if open_file and self.options['open_nsf']:
             subprocess.call(['open', path.replace('.mml', '.nsf')])
@@ -202,13 +212,13 @@ class MusicBox(object):
 
             new_output = output
             if song[1] is not None:
-                new_output = new_output.replace('.mml', '_' + song[1] + '.mml') 
+                new_output = new_output.replace('.mml', '_' + song[1] + '.mml')
 
             self.handleProcessedFile(song[0], new_output, open_file)
-        
+
         if self.options['separate_voices']:
             self.logger.log("")
-    
+
     def handleProcessedFile(self, content, output, open_file = False):
         if self.options['create_mml']:
             self.logger.log('generating file: ' + self.logger.color(output, self.logger.YELLOW))

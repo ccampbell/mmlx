@@ -29,7 +29,7 @@ http://nullsleep.com/treasure/mck_guide/
 this may have to be run as root
 
 ## Quick start (stable release)
-    pip install https://github.com/ccampbell/mmlx/zipball/1.0.2
+    pip install mmlx
     mmlx --watch path/to/mmlx
 
 for additional options run

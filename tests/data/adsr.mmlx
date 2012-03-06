@@ -1,0 +1,38 @@
+/**
+ * start at 15 and go to 0 in 10 steps
+ */
+adsr1:
+    adsr: 0 0 15 10
+
+/**
+ * same as adsr1 but written differently
+ */
+adsr2:
+    adsr: 0 0 0 10
+
+/**
+ * start at 0 go to 10 in 10 frames then go to 0 in 20 frames
+ */
+adsr3:
+    adsr: 10 10 10 20
+
+/**
+ * start at 5 and go to 0 in 6 steps
+ */
+adsr4:
+    adsr: 0 0 5 6
+
+/**
+ * test with sustain at max
+ */
+adsr5:
+    adsr: 5 0 10 5
+
+/**
+ * test using max_volume property
+ */
+adsr6:
+    adsr: 0 5 8 10
+    max_volume: 12
+
+A @adsr1 c @adsr2 d @adsr3 e @adsr4 f @adsr5 g @adsr6 a

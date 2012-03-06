@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
-import os, unittest, sys, inspect
+import os, unittest, sys, inspect, glob
 
 cmd_folder = os.path.split(inspect.getfile(inspect.currentframe()))[0] + '/../mmlxlib'
 if cmd_folder not in sys.path:
     sys.path.insert(0, cmd_folder)
 
 from instrument import Instrument
+from warpwhistle import WarpWhistle
 
 class InstrumentTest(unittest.TestCase):
 
@@ -59,6 +60,61 @@ class InstrumentTest(unittest.TestCase):
         self.assertEqual(instrument.volume, '8 7 6 5 4')
         self.assertEqual(instrument.q, '4')
         self.assertEqual(instrument.timbre, '0 0 2')
+
+class Logger(object):
+    BLUE = 'blue'
+    LIGHT_BLUE = 'light_blue'
+    PINK = 'pink'
+    YELLOW = 'yellow'
+    WHITE = 'white'
+    GREEN = 'green'
+    RED = 'red'
+    GRAY = 'gray'
+    UNDERLINE = 'underline'
+    ITALIC = 'italic'
+
+    def color(self, message, color, bold = False):
+        pass
+
+    def log(self, message, verbose_only=False):
+        pass
+
+class MMLXTest(unittest.TestCase):
+    def removeWhitespace(self, content):
+        lines = content.splitlines()
+        new_lines = []
+        for line in lines:
+            new_lines.append(line.strip())
+
+        string = "\n".join(new_lines)
+
+        # remove any new lines at beginning or end of string
+        return string.strip()
+
+    def getContents(self, path):
+        file = open(path, "r")
+        content = file.read()
+        file.close()
+
+        return content
+
+    def testMatches(self):
+        data = os.path.join(os.path.dirname(__file__), 'data')
+        mmlx_files = glob.glob(data + '/*.mmlx')
+        for mmlx_file in mmlx_files:
+            content = self.getContents(mmlx_file)
+
+            whistle = WarpWhistle(content, Logger(), {})
+
+            mml_file_name = mmlx_file.replace('.mmlx', '.mml')
+
+            self.assertTrue(os.path.exists(mml_file_name), "\n\nFile does not exist at: " + mml_file_name)
+
+            mml_content = self.removeWhitespace(self.getContents(mml_file_name))
+
+            mml = self.removeWhitespace(whistle.play()[0])
+
+            self.assertEqual(mml_content, mml, "\n\nFailure in test: " + mmlx_file + '\nExpected: \'' + mml_content.replace('\n', '\\n') + '\'' + '\nActual: \'' + mml.replace('\n', '\\n') + '\'')
 
 if __name__ == '__main__':
     unittest.main()

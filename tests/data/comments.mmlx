@@ -1,0 +1,7 @@
+/**
+ * this is a test to make sure all comments get stripped
+ */
+// ones like this too
+; and like this
+A a b c // and on the end of a line
+B c d e /* and in the middle of a line */ f

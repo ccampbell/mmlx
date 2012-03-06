@@ -1,0 +1,7 @@
+
+square-test:
+    timbre: 2
+    volume: 15
+    q: 8
+
+A o3 @square-test c

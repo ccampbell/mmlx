@@ -27,7 +27,7 @@ class WarpWhistle(object):
     OCTAVE = 'octave'
     SLIDE = 'slide'
     Q = 'q'
-    
+
     ABSOLUTE_NOTES = 'X-ABSOLUTE-NOTES'
     TRANSPOSE = 'X-TRANSPOSE'
     COUNTER = 'X-COUNTER'
@@ -37,7 +37,7 @@ class WarpWhistle(object):
     FDS = 'EX-DISKFM'
     VRC6 = 'EX-VRC6'
     PITCH_CORRECTION = 'PITCH-CORRECTION'
-    
+
     CHIP_N106 = 'N106'
     CHIP_FDS = 'FDS'
     CHIP_VRC6 = 'VRC6'
@@ -235,7 +235,7 @@ class WarpWhistle(object):
 
         self.updateInstruments()
         return content
-    
+
     def getVoicesForChip(self, chip):
         if chip == WarpWhistle.CHIP_N106:
             return {
@@ -248,27 +248,27 @@ class WarpWhistle(object):
                 'G': 'V',
                 'H': 'W'
             }
-        
+
         if chip == WarpWhistle.CHIP_FDS:
             return {
                 'A': 'F'
             }
-        
+
         if chip == WarpWhistle.CHIP_VRC6:
             return {
                 'A': 'M',
                 'B': 'N',
                 'C': 'O'
             }
-    
+
     def getVoiceTranslation(self, chip, voice):
         voices = self.getVoicesForChip(chip)
-        
+
         if not voice in voices:
             return None
-                
+
         return voices[voice]
-    
+
     def getVoiceFor(self, chip, voices):
         final_voices = []
         voices = list(voices)
@@ -276,11 +276,11 @@ class WarpWhistle(object):
             new_voice = self.getVoiceTranslation(chip, voice)
             if new_voice is None:
                 raise Exception('voice: ' + voice + ' is outside of the voice range for chip: ' + chip)
-            
+
             final_voices.append(new_voice)
-        
+
         return ''.join(final_voices)
-    
+
     def processExpansionVoices(self, content):
         """finds any special voices (such as N106-AB) and converts them to the proper voice names"""
         matches = re.findall(r'((N106|FDS|VRC6)-([A-Z]+) )', content)
@@ -288,12 +288,12 @@ class WarpWhistle(object):
             content = content.replace(match[0], self.getVoiceFor(match[1], match[2]) + ' ')
 
         return content
-    
+
     def renderTempo(self, content):
         tempo = self.getGlobalVar(WarpWhistle.X_TEMPO)
         if tempo is None:
             return content
-        
+
         return self.addToMml(content, "".join(self.voices) + " t" + str(tempo) + "\n")
 
     def renderInstruments(self, content):
@@ -306,29 +306,29 @@ class WarpWhistle(object):
     def renderN106(self, content):
         n106_voices = self.getVoicesForChip(WarpWhistle.CHIP_N106).values()
         n106_voices.sort()
-        
+
         n106_count = 0
         for voice in self.voices:
             if voice in n106_voices:
                 index = n106_voices.index(voice) + 1
                 n106_count = max(n106_count, index)
-            
+
         if n106_count > 0:
             # in order to stay on pitch it has to be 1,2,4 or 8
             if n106_count == 3:
                 n106_count = 4
-            
+
             if n106_count in [5, 6, 7]:
                 n106_count = 8
-            
+
             if not WarpWhistle.N106 in self.global_vars:
                 self.global_vars[WarpWhistle.N106] = str(n106_count)
                 content = self.addToMml(content, '#' + WarpWhistle.N106 + ' ' + str(n106_count) + '\n', True)
-            
+
             if not WarpWhistle.PITCH_CORRECTION in self.global_vars:
                 self.global_vars[WarpWhistle.PITCH_CORRECTION] = True
                 content = self.addToMml(content, '#' + WarpWhistle.PITCH_CORRECTION + '\n', True)
-        
+
         return content
 
     def getExpForChip(self, chip):
@@ -342,20 +342,20 @@ class WarpWhistle(object):
     def renderForChip(self, chip, content):
         chip_voices = self.getVoicesForChip(chip).values()
         chip_voices.sort()
-        
+
         used = False
         for voice in self.voices:
             if voice in chip_voices:
                 used = True
                 break
-        
+
         exp = self.getExpForChip(chip)
         if used and not exp in self.global_vars:
             self.global_vars[exp] = True
             content = self.addToMml(content, '#' + exp + '\n', True)
-            
+
         return content
-        
+
     def renderExpansionChips(self, content):
         content = self.renderN106(content)
         content = self.renderForChip(WarpWhistle.CHIP_FDS, content)
@@ -364,11 +364,15 @@ class WarpWhistle(object):
         return content
 
     def addToMml(self, content, string, is_global_line = False):
-        last_global_declaration = self.global_lines[-1]
-        
+        try:
+            last_global_declaration = self.global_lines[-1]
+        except:
+            # if there are no global lines then prepend
+            return string + content
+
         if is_global_line:
             self.global_lines.append(string)
-            
+
         return content.replace(last_global_declaration, last_global_declaration + string)
 
     def replaceVariables(self, content):
@@ -486,14 +490,14 @@ class WarpWhistle(object):
                     break
 
             shift = self.calculateN106OctaveShift(int(N106_channels), waveform)
-        
+
         match = re.match(r'^(\[+)?([a-g](\+|\-)?)(.*)$', start_data['note'])
         start_data['note'] = match.group(2)
         start_data['append'] = match.group(4)
 
         # total amount we need to move
         slide_amount = self.getFrequency(start_data['note'], start_data['octave'] + shift) - self.getFrequency(end_data['note'], end_data['octave'] + shift)
-                
+
         # song tempo
         tempo = self.getDataForVoice(self.current_voices[0], WarpWhistle.TEMPO)
 
@@ -560,7 +564,7 @@ class WarpWhistle(object):
         smooth_end = ''
         if len(diff) == 0:
             smooth = self.getGlobalVar(WarpWhistle.SMOOTH)
-        
+
             if smooth:
                 smooth_start = ' SM '
                 smooth_end = ' SMOF'
@@ -611,24 +615,24 @@ class WarpWhistle(object):
         if word in valid_commands:
             if self.ignore:
                 return ""
-            
+
             return word
-        
+
         # matches a voice declaration
         if re.match(r'[A-Z]{1,}$', word):
-            
+
             self.current_voices = list(word)
 
             # processing everything, keep going
             if self.process_voice is None:
                 return word
-            
+
             # if we are processing a specific voice
             # and we are on that voice
             if self.process_voice in self.current_voices:
                 self.ignore = False
                 return self.process_voice
-            
+
             # if we are processing a specific voice and we are not on that voice
             self.ignore = True
             return ""
@@ -816,7 +820,7 @@ class WarpWhistle(object):
                 return word
 
             new_instrument = self.instruments[match.group(3)]
-            
+
             if 'O' in self.current_voices and hasattr(new_instrument, 'timbre'):
                 raise Exception('VRC6 sawtooth (voice O) does not support timbre attribute')
 
@@ -824,7 +828,7 @@ class WarpWhistle(object):
             diff = []
             if chip is not None:
                 diff = Util.arrayDiff(self.current_voices, self.getVoicesForChip(chip).values())
-            
+
             if len(diff):
                 diff.sort()
                 words = ('voice', 'does') if len(diff) == 1 else ('voices', 'do')
@@ -882,7 +886,7 @@ class WarpWhistle(object):
             new_words.append(self.processWord(word, next_word, prev_word))
 
         return ' '.join(new_words)
-    
+
     def findVoices(self, content):
         matches = re.findall(r'^([A-Z]{1,}) ', content, re.MULTILINE)
 
@@ -892,7 +896,7 @@ class WarpWhistle(object):
             for voice in new_voices:
                 if not voice in voices:
                     voices.append(voice)
-        
+
         return voices
 
     def process(self, content):
@@ -916,7 +920,7 @@ class WarpWhistle(object):
 
         self.logger.log('- collapsing spaces', True)
         content = self.collapseSpaces(content)
-        
+
         self.logger.log('- processing expansion voices', True)
         content = self.processExpansionVoices(content)
 
@@ -928,10 +932,10 @@ class WarpWhistle(object):
         if not self.first_run:
             if self.voices_to_process is None:
                 self.voices_to_process = self.voices
-            
+
             if len(self.voices_to_process):
                 self.process_voice = self.voices_to_process.pop(0)
-            
+
         if self.process_voice:
             self.logger.log('processing voice: ' + self.process_voice, True)
 
@@ -965,7 +969,7 @@ class WarpWhistle(object):
 
         if not self.options['separate_voices']:
             return False
-        
+
         return self.voices_to_process is None or len(self.voices_to_process) != 0
 
     def play(self):

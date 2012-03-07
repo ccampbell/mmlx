@@ -110,6 +110,12 @@ class WarpWhistle(object):
             file_content = Util.openFile(disk_path)
             content = content.replace(match[0], file_content)
 
+        self.logger.log('- stripping comments again', True)
+        content = self.stripComments(content)
+
+        if content.find('@import') > 0:
+            content = self.processImports(content)
+
         return content
 
     def stripComments(self, content):
@@ -909,9 +915,6 @@ class WarpWhistle(object):
 
         self.logger.log('- proccessing imports', True)
         content = self.processImports(content)
-
-        self.logger.log('- stripping comments again', True)
-        content = self.stripComments(content)
 
         self.logger.log('- parsing variables', True)
         content = self.processVariables(content)

@@ -956,11 +956,10 @@ class WarpWhistle(object):
         content = self.renderInstruments(content)
 
         self.logger.log('- replacing unneccessary octave shifts', True)
-        while content.find('> <') > 0:
-            content = content.replace('> <', '')
-
-        while content.find('< >') > 0:
-            content = content.replace('< >', '')
+        patterns = ['><', '> <', '<>', '< >']
+        for pattern in patterns:
+            while content.find(pattern) > 0:
+                content = content.replace(pattern, '')
 
         self.logger.log('- replacing extra spaces', True)
         content = self.collapseSpaces(content)

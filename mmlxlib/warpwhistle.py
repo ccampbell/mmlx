@@ -501,6 +501,10 @@ class WarpWhistle(object):
         # song tempo
         tempo = self.getDataForVoice(self.current_voices[0], WarpWhistle.TEMPO)
 
+        # make sure if tempo is none we default to 120
+        if tempo is None:
+            tempo = 120
+
         # @todo this is NTSC, need to add support for PAL - 50 FPS
         frames_per_second = 60
 

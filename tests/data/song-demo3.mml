@@ -1,0 +1,16 @@
+#TITLE Demo 3
+#COMPOSER Craig Campbell
+#PROGRAMER Craig Campbell
+@20 = { 1 }
+@21 = { 2 }
+@v20 = { 10 }
+@v21 = { 12 }
+@EP20 = { 23 23 24 24 24 24 0 }
+@EP21 = { 21 21 21 21 21 22 0 }
+@EP22 = { -16 -16 -16 -16 -16 -16 0 }
+@EN20 = { 0 0 4 0 0 3 0 0 5 0 0 }
+@EN21 = { 0 0 3 0 0 4 0 0 5 0 0 }
+ABCDE t150
+@v1 = { 5 }
+A o4 SD0 @vr1 [@@20 @v20 q6 c c @@21 @v21 EN20 q4 c ENOF @@20 @v20 q6 EP20 c EPOF d d @@21 @v21 EN20 q4 d ENOF @@20 @v20 q6 EP21 d EPOF g g @@21 @v21 EN20 q4 g ENOF @@20 @v20 q6 EP22 g EPOF e e @@21 @v21 EN21 q4 e ENOF @@20 @v20 q6 e]2 SDOF
+C o4 [c c e8 e8 g8 g8 d d f+8 f+8 a8 a8 g g b8 b8 d8 d8 e e g8 g8 b8 b8]2

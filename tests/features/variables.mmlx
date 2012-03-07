@@ -1,0 +1,4 @@
+test_var = a c e > a
+test_var2 = c e g > c
+A test_var
+A [test_var2]5

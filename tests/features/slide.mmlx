@@ -1,1 +1,19 @@
-A o4 c1 /4 > > g1
+square:
+    timbre: 2
+    volume: 10
+
+// sixteenth note slide
+A o4 @square c1 /16 > > g1
+A o4 @square c1 / > > g1
+
+// eigth note slide
+A o4 @square c1 /8 > > g1
+
+// quarter note slide
+A o4 @square c1 /4 > > g1
+
+// half note slide
+A o4 @square c1 /2 > > g1
+
+// whole note slide
+A o4 @square c1^1 /1 > > g1^1

@@ -953,11 +953,13 @@ class WarpWhistle(object):
         content = self.renderInstruments(content)
 
         self.logger.log('- replacing unneccessary octave shifts', True)
-        levels = math.ceil(abs(float(self.getGlobalVar(WarpWhistle.TRANSPOSE))) / float(12))
-        for x in range(0, int(levels) + 1):
-            content = self.collapseSpaces(content)
-            content = content.replace('> <', '').replace('< >', '')
+        while content.find('> <') > 0:
+            content = content.replace('> <', '')
 
+        while content.find('< >') > 0:
+            content = content.replace('< >', '')
+
+        self.logger.log('- replacing extra spaces', True)
         content = self.collapseSpaces(content)
 
         self.logger.log('- removing blank lines', True)

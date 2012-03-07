@@ -111,9 +111,13 @@ class MMLXTest(unittest.TestCase):
         data = os.path.join(os.path.dirname(__file__), directory)
         mmlx_files = glob.glob(data + '/*.mmlx')
         for mmlx_file in mmlx_files:
+            if os.path.basename(mmlx_file).startswith('_'):
+                continue
+
             content = self.getContents(mmlx_file)
 
             whistle = WarpWhistle(content, Logger(), {})
+            whistle.import_directory = os.path.dirname(mmlx_file)
 
             mml_file_name = mmlx_file.replace('.mmlx', '.mml')
 

@@ -98,8 +98,17 @@ class MMLXTest(unittest.TestCase):
 
         return content
 
-    def testMatches(self):
-        data = os.path.join(os.path.dirname(__file__), 'data')
+    def testFeatures(self):
+        self.runForDirectory('features')
+
+    def testChips(self):
+        self.runForDirectory('chips')
+
+    def testSongs(self):
+        self.runForDirectory('songs')
+
+    def runForDirectory(self, directory):
+        data = os.path.join(os.path.dirname(__file__), directory)
         mmlx_files = glob.glob(data + '/*.mmlx')
         for mmlx_file in mmlx_files:
             content = self.getContents(mmlx_file)

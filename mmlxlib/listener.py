@@ -13,7 +13,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import os, glob, time, sys
+import os
+import glob
+import time
+import sys
+
 
 class Listener(object):
 
@@ -24,7 +28,7 @@ class Listener(object):
         self.file_list = {}
         self.logger = logger
 
-    def getFilesFromDir(self, path, extension = ""):
+    def getFilesFromDir(self, path, extension=""):
         path = path + "/*"
 
         if not extension == "":
@@ -35,7 +39,7 @@ class Listener(object):
     def onChange(self, callback):
         self.callback = callback
 
-    def process(self, start, end, is_dir = None):
+    def process(self, start, end, is_dir=None):
         try:
             if is_dir is None:
                 is_dir = os.path.isdir(start)
@@ -59,7 +63,7 @@ class Listener(object):
                 last_changed = os.stat(file).st_mtime
                 output_file = output_file if output_file is not None else os.path.join(end, filename.replace(".mmlx", ".mml"))
 
-                if not self.file_list.has_key(file):
+                if not file in self.file_list:
                     self.file_list[file] = last_changed
                     self.callback(file, output_file)
                     continue

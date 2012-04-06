@@ -13,12 +13,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import re, os, subprocess, sys, getopt, shutil
+import os
+import subprocess
+import sys
+import shutil
 from warpwhistle import WarpWhistle
 from util import Util
 from instrument import Instrument
 from listener import Listener
 from logger import Logger
+
 
 class MusicBox(object):
     VERSION = '1.0.2'
@@ -40,7 +44,7 @@ class MusicBox(object):
             return self.showUsage()
 
         try:
-            for key,arg in enumerate(args):
+            for key, arg in enumerate(args):
                 if arg == '--verbose':
                     options['verbose'] = True
                 elif arg == '--open-nsf':
@@ -118,7 +122,7 @@ class MusicBox(object):
         self.logger.log(self.logger.color('_|      _|  _|      _|  _|_|_|_|  _|      _|  ', self.logger.PINK))
         self.logger.log(self.logger.color('                                 version ' + self.logger.color(MusicBox.VERSION, self.logger.PINK, True) + '\n', self.logger.PINK))
 
-    def showUsage(self, message = None):
+    def showUsage(self, message=None):
         logger = self.logger
         if message is not None:
             logger.log(logger.color('ERROR:', logger.RED))
@@ -129,8 +133,8 @@ class MusicBox(object):
         logger.log(logger.color('--verbose', logger.WHITE) + '                             shows verbose output')
         logger.log(logger.color('--open-nsf', logger.WHITE) + '                            opens nsf file on save')
         logger.log(logger.color('--bob-omb', logger.WHITE) + '                             generates a separate NSF file for each voice')
-        logger.log(logger.color('--create-mml ' + logger.color('0', logger.YELLOW), logger.WHITE) +'                        creates an MML file on save (defaults to 0)')
-        logger.log(logger.color('--create-nsf ' + logger.color('1', logger.YELLOW), logger.WHITE) +'                        creates an NSF file on save (defaults to 1)')
+        logger.log(logger.color('--create-mml ' + logger.color('0', logger.YELLOW), logger.WHITE) + '                        creates an MML file on save (defaults to 0)')
+        logger.log(logger.color('--create-nsf ' + logger.color('1', logger.YELLOW), logger.WHITE) + '                        creates an NSF file on save (defaults to 1)')
         logger.log(logger.color('--watch', logger.WHITE) + logger.color(' path/to/mmlx', logger.YELLOW) + logger.color(':', logger.GRAY) + logger.color('path/to/mml', logger.YELLOW) + '      watches for changes in first directory and compiles to second')
         logger.log(logger.color('\nEXAMPLES:', logger.WHITE, True))
 
@@ -153,7 +157,7 @@ class MusicBox(object):
 
         sys.exit(1)
 
-    def createNSF(self, path, open_file = False):
+    def createNSF(self, path, open_file=False):
         self.logger.log('generating file: ' + self.logger.color(path.replace('.mml', '.nsf'), self.logger.YELLOW))
 
         nes_include_path = os.path.join(os.path.dirname(__file__), 'nes_include')
@@ -167,16 +171,16 @@ class MusicBox(object):
 
         os.environ['NES_INCLUDE'] = nes_include_path
         command = os.path.join(bin_dir, 'ppmckc') if self.options['local'] else 'ppmckc'
-        output = subprocess.Popen([command, '-m1', '-i', path], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        parts = output.communicate()
-        stdout = parts[0]
-        stderr = parts[1]
+        subprocess.Popen([command, '-m1', '-i', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # parts = output.communicate()
+        # stdout = parts[0]
+        # stderr = parts[1]
 
         command = os.path.join(bin_dir, 'nesasm') if self.options['local'] else 'nesasm'
-        output = subprocess.Popen([command, '-s', '-raw', os.path.join(nes_include_path, 'ppmck.asm')], stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        parts = output.communicate()
-        stdout = parts[0]
-        stderr = parts[1]
+        subprocess.Popen([command, '-s', '-raw', os.path.join(nes_include_path, 'ppmck.asm')], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # parts = output.communicate()
+        # stdout = parts[0]
+        # stderr = parts[1]
 
         nsf_path = os.path.join(nes_include_path, 'ppmck.nes')
         if not os.path.isfile(nsf_path):
@@ -196,11 +200,11 @@ class MusicBox(object):
         if open_file and self.options['open_nsf']:
             subprocess.call(['open', path.replace('.mml', '.nsf')])
 
-    def processFile(self, input, output, open_file = False):
+    def processFile(self, input, output, open_file=False):
         Instrument.reset()
 
         self.logger.log('processing file: ' + self.logger.color(input, self.logger.YELLOW), True)
-        original_content = content = Util.openFile(input)
+        content = Util.openFile(input)
 
         whistle = WarpWhistle(content, self.logger, self.options)
         whistle.import_directory = os.path.dirname(input)
@@ -219,7 +223,7 @@ class MusicBox(object):
         if self.options['separate_voices']:
             self.logger.log("")
 
-    def handleProcessedFile(self, content, output, open_file = False):
+    def handleProcessedFile(self, content, output, open_file=False):
         if self.options['create_mml']:
             self.logger.log('generating file: ' + self.logger.color(output, self.logger.YELLOW))
 

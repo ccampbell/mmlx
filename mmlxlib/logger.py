@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+
 class Logger(object):
     BLUE = 'blue'
     LIGHT_BLUE = 'light_blue'
@@ -28,7 +30,7 @@ class Logger(object):
     def __init__(self, options):
         self.verbose = options["verbose"]
 
-    def color(self, message, color, bold = False):
+    def color(self, message, color, bold=False):
         colors = {
             'italic': '\033[3m',
             'underline': '\033[4m',

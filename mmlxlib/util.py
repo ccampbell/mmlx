@@ -13,7 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import operator, os
+import operator
+import os
+
 
 class Util(object):
 
@@ -21,12 +23,12 @@ class Util(object):
     def arrayDiff(list1, list2):
         if type(list1) is dict:
             list1 = list1.values()
-        
+
         if type(list2) is dict:
             list2 = list2.values()
-        
+
         diff = set(list1) - set(list2)
-        
+
         return list(diff)
 
     @staticmethod

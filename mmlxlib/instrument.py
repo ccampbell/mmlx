@@ -16,6 +16,7 @@
 from util import Util
 import math
 
+
 class Instrument(object):
 
     def __init__(self, data):
@@ -103,7 +104,7 @@ class Instrument(object):
         return None
 
     @staticmethod
-    def reset(counter = 0):
+    def reset(counter=0):
         counter = int(counter)
 
         Instrument.counters = {
@@ -179,7 +180,6 @@ class Instrument(object):
         i = Instrument.FDS[self.waveform] if self.waveform in Instrument.FDS else self.getCountFor('FDS')
         Instrument.FDS[self.waveform] = i
         return '@@' + str(i)
-
 
     @staticmethod
     def hasBeenUsed():

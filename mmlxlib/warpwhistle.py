@@ -13,9 +13,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-import re, os, math
+import re
+import os
+import math
 from util import Util
 from instrument import Instrument
+
 
 class WarpWhistle(object):
     TEMPO = 'tempo'
@@ -369,7 +372,7 @@ class WarpWhistle(object):
 
         return content
 
-    def addToMml(self, content, string, is_global_line = False):
+    def addToMml(self, content, string, is_global_line=False):
         try:
             last_global_declaration = self.global_lines[-1]
         except:
@@ -552,7 +555,7 @@ class WarpWhistle(object):
         self.setDataForVoices(self.current_voices, WarpWhistle.SLIDE, None)
 
         append_before = end_data['append']
-        append_after =''
+        append_after = ''
         match = re.match(r'(.*)(\](.*))', end_data['append'])
         if match:
 
@@ -607,7 +610,7 @@ class WarpWhistle(object):
             new_note_number = new_note_number + 12
 
         while new_note_number > 11:
-            ticks  -= 1
+            ticks -= 1
             new_note += '> '
             new_note_number = new_note_number - 12
 
@@ -776,7 +779,7 @@ class WarpWhistle(object):
 
             # tack on any ties (such as ^8^16)
             if match.group(7):
-                append +=  match.group(7)
+                append += match.group(7)
 
             # tack on the final repeat value if it is present (]4)
             if match.group(8):

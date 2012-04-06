@@ -28,8 +28,11 @@ class Instrument(object):
 
             setattr(self, key, data[key])
 
-        if hasattr(self, "adsr"):
+        if hasattr(self, 'adsr'):
             self.volume = self.getVolumeFromADSR(self.adsr)
+
+        if hasattr(self, 'volume'):
+            self.volume = self.magicMacro(self.volume)
 
         if self.getChip() == 'N106':
             Instrument.N106_buffers[self.waveform] = int(self.buffer) if hasattr(self, 'buffer') else None
@@ -96,6 +99,37 @@ class Instrument(object):
 
         # print values
         return values
+
+    def magicMacro(self, macro):
+        if not ':' in macro:
+            return macro
+
+        groups = macro.split(' ')
+
+        values = []
+        for group in groups:
+            group_bits = group.split(':')
+
+            if len(group_bits) == 1:
+                values.append(group)
+                continue
+
+            first = float(group_bits[0])
+            last = float(group_bits[1])
+            rate = float(group_bits[2]) if len(group_bits) == 3 else 1
+            start = first
+
+            if first > last:
+                while start >= last:
+                    values.append(str(int(math.floor(start))))
+                    start -= abs(rate)
+                continue
+
+            while start <= last:
+                values.append(str(int(math.floor(start))))
+                start += rate
+
+        return ' '.join(values)
 
     def getChip(self):
         if hasattr(self, 'chip'):

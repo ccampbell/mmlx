@@ -223,7 +223,7 @@ class WarpWhistle(object):
                 data["extends"] = match.group(2)
                 continue
 
-            data[line.split(':')[0].strip()] = line.split(':')[1].strip()
+            data[line.split(':', 1)[0].strip()] = line.split(':', 1)[1].strip()
 
         self.instruments[name] = Instrument(data)
 

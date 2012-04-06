@@ -10,6 +10,8 @@
 	<string>/\*\*|\{\s*$</string>
 	<key>foldingStopMarker</key>
 	<string>\*\*/|^\s*\}</string>
+	<key>isDisabled</key>
+	<false/>
 	<key>name</key>
 	<string>MMLX</string>
 	<key>patterns</key>
@@ -146,25 +148,25 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>\b(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}\|? {0,}(-)?([0-9]+)?(N106$|FDS$|VRC6$|VRC7$)?</string>
+			<string>(\t| {4})(volume|timbre|adsr|max_volume|pitch|arpeggio|vibrato|q|chip|waveform|buffer): {0,}\|? {0,}(-)?([0-9]+)?(N106$|FDS$|VRC6$|VRC7$)?</string>
 			<key>beginCaptures</key>
 			<dict>
-				<key>1</key>
+				<key>2</key>
 				<dict>
 					<key>name</key>
 					<string>support.function</string>
 				</dict>
-				<key>2</key>
+				<key>3</key>
 				<dict>
 					<key>name</key>
 					<string>keyword.operator</string>
 				</dict>
-				<key>3</key>
+				<key>4</key>
 				<dict>
 					<key>name</key>
 					<string>constant</string>
 				</dict>
-				<key>4</key>
+				<key>5</key>
 				<dict>
 					<key>name</key>
 					<string>constant</string>
@@ -175,29 +177,10 @@
 		</dict>
 		<dict>
 			<key>begin</key>
-			<string>( |\]|\:|\|)([0-9]+)</string>
+			<string>\b(?&lt;![a-g]\+)(?&lt;![a-g]\-)(?&lt;!\/)(\d+)</string>
 			<key>beginCaptures</key>
 			<dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>constant</string>
-				</dict>
-			</dict>
-			<key>end</key>
-			<string>(\]|\b)</string>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>( |\:|\|)(-)([0-9]+)</string>
-			<key>beginCaptures</key>
-			<dict>
-				<key>2</key>
-				<dict>
-					<key>name</key>
-					<string>keyword.operator</string>
-				</dict>
-				<key>3</key>
+				<key>1</key>
 				<dict>
 					<key>name</key>
 					<string>constant</string>
@@ -208,20 +191,12 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>[=&gt;&lt;\^\.\+]</string>
+			<string>(?&lt;![a-g])[=&gt;&lt;\^\.\+\-]</string>
 			<key>name</key>
 			<string>keyword.operator</string>
 		</dict>
 		<dict>
-			<key>match</key>
-			<string>/-/s</string>
-			<key>name</key>
-			<string>keyword.operator</string>
-		</dict>
-		<dict>
-			<key>begin</key>
-			<string>^([a-zA-Z0-9\-_]+):( {0,})</string>
-			<key>beginCaptures</key>
+			<key>captures</key>
 			<dict>
 				<key>1</key>
 				<dict>
@@ -229,8 +204,8 @@
 					<string>entity.instrument</string>
 				</dict>
 			</dict>
-			<key>end</key>
-			<string>\n</string>
+			<key>match</key>
+			<string>^([a-zA-Z0-9\-_]+):( {0,})$</string>
 		</dict>
 	</array>
 	<key>scopeName</key>

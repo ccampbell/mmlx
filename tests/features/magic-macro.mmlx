@@ -1,16 +1,16 @@
 climb-and-fall:
-    volume: 0:15 15:0
+    volume: 0..15 15..0
 
 slow-climb:
-    volume: 0 0 0 0 1:7:0.5 7:12
+    volume: 0 0 0 0 1(+0.5)..7 7..12
 
 all-over-the-place:
-    volume: 15:3 3 3:7 7 7:0
+    volume: 15..3 3 3..7 7 7..0
 
 falling-positive:
-    volume: 15:0:.5
+    volume: 15(.5)..0
 
 falling-negative:
-    volume: 15:0:-.5
+    volume: 15(-.5)..0
 
 A @climb-and-fall @slow-climb @all-over-the-place @falling-positive @falling-negative

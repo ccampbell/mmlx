@@ -15,6 +15,7 @@
 # limitations under the License.
 from util import Util
 import math
+import re
 
 
 class Instrument(object):
@@ -101,22 +102,23 @@ class Instrument(object):
         return values
 
     def magicMacro(self, macro):
-        if not ':' in macro:
-            return macro
-
         groups = macro.split(' ')
 
         values = []
         for group in groups:
-            group_bits = group.split(':')
-
-            if len(group_bits) == 1:
+            if not '..' in group:
                 values.append(group)
                 continue
 
-            first = float(group_bits[0])
-            last = float(group_bits[1])
-            rate = float(group_bits[2]) if len(group_bits) == 3 else 1
+            match = re.match(r'(\d+)(\((\+|\-)?(\.?\d+(\.\d+)?)\))?..(\d+)', group)
+            if not match:
+                values.append(group)
+                continue
+
+            first = int(match.group(1))
+            last = int(match.group(6))
+            rate = float(match.group(4)) if match.group(4) else 1
+
             start = first
 
             if first > last:

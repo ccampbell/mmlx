@@ -22,4 +22,7 @@ repeat6:
 repeat7:
     volume: [1(+2)..15].repeat(2)
 
-A @repeat1 @repeat2 @repeat3 @repeat4 @repeat5 @repeat6 @repeat7
+repeat8:
+    volume: [[1..15].step(2)].repeat(2)
+
+A @repeat1 @repeat2 @repeat3 @repeat4 @repeat5 @repeat6 @repeat7 @repeat8

@@ -125,35 +125,39 @@ class Instrument(object):
 
     def magicMacroObjects(self, macro):
         # bracket objects
-        match = re.match(r'(\[(.*)\](\.[a-zA-Z]{1}.*\))+)', macro)
+        match = re.match(r'(\[(.*)\]((\.[a-zA-Z]{1}.*?\))+))', macro)
+        original = True
 
         if not match:
+            original = False
             # no bracket
-            match = re.match(r'((.*?)(\.[a-zA-Z]{1}.*\))+)', macro)
+            match = re.match(r'((.*?)((\.[a-zA-Z]{1}.*?\))+))', macro)
 
         if match:
             # print 'MACRO',macro
+            # print 'ORIGINAL',original
             # print 'GROUP1',match.group(1)
             # print 'GROUP2',match.group(2)
             # print 'GROUP3',match.group(3)
 
             # print 'GROUP4',match.group(4)
-            magic = MagicMacro(macro.replace(match.group(1), self.magicMacroObjects(match.group(2))))
+            magic = MagicMacro(self.magicMacroObjects(match.group(2).split(' ').pop() if not original else match.group(2)))
+            # magic = MagicMacro(macro.replace(match.group(1), self.magicMacroObjects(match.group(2)), 1))
 
             methods = match.group(3)[1:-1].split(').')
+            # print 'METHODS',methods,"\n"
             for method in methods:
                 getattr(magic, method.split('(')[0])(*method.split('(')[1].split(','))
 
-            return str(magic)
+            macro = macro.replace(match.group(1).split(' ').pop() if not original else match.group(1), str(magic), 1)
+
+            return self.magicMacroObjects(macro)
 
         # print macro
         return str(MagicMacro(macro))
 
     def magicMacro(self, macro):
-        # macro = self.processRepeats(macro)
-        return self.magicMacroObjects(macro)
-        # print 'RESULT',test
-
+        return self.magicMacroObjects(macro).strip()
 
     def getChip(self):
         if hasattr(self, 'chip'):
@@ -445,9 +449,11 @@ class MagicMacro(object):
         self.new_macro = macro
 
     def repeat(self, count):
-        self.new_macro = ((' ' + self.new_macro) * 2).replace('  ', ' ')
+        # print 'repeat', self.new_macro
+        self.new_macro = ((' ' + self.new_macro) * int(count)).replace('  ', ' ')
 
     def step(self, rate):
+        # print 'calling step with rate',rate,'for macro',self.new_macro
         first = int(self.macro.split(' ')[0])
         last = int(self.macro.split(' ').pop())
         self.new_macro = ' '.join(self.getMagicSteps(first, last, float(rate)))

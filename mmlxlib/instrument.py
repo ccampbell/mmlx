@@ -101,37 +101,59 @@ class Instrument(object):
         # print values
         return values
 
+    # def processRepeats(self, macro):
+    #     if not "'" in macro:
+    #         return macro
+
+    #     # group repeats
+    #     match = re.match(r'\((.*)\)\'(\d+)', macro)
+
+    #     if not match:
+
+    #         # single repeat
+    #         match = re.match(r'\b(.*?)\'(\d+)', macro)
+
+    #     if not match:
+    #         return macro
+    #     print 'GROUP1',match.group(1)
+    #     print 'GROUP2',match.group(2)
+    #     repeats = int(match.group(2))
+    #     pattern = match.group(1)
+    #     replacement = (pattern + ' ') * repeats
+
+    #     return self.processRepeats(macro.replace(match.group(0), replacement).replace('  ', ' '))
+
+    def magicMacroObjects(self, macro):
+        # bracket objects
+        match = re.match(r'(\[(.*)\](\.[a-zA-Z]{1}.*\))+)', macro)
+
+        if not match:
+            # no bracket
+            match = re.match(r'((.*?)(\.[a-zA-Z]{1}.*\))+)', macro)
+
+        if match:
+            # print 'MACRO',macro
+            # print 'GROUP1',match.group(1)
+            # print 'GROUP2',match.group(2)
+            # print 'GROUP3',match.group(3)
+
+            # print 'GROUP4',match.group(4)
+            magic = MagicMacro(macro.replace(match.group(1), self.magicMacroObjects(match.group(2))))
+
+            methods = match.group(3)[1:-1].split(').')
+            for method in methods:
+                getattr(magic, method.split('(')[0])(*method.split('(')[1].split(','))
+
+            return str(magic)
+
+        # print macro
+        return str(MagicMacro(macro))
+
     def magicMacro(self, macro):
-        groups = macro.split(' ')
+        # macro = self.processRepeats(macro)
+        return self.magicMacroObjects(macro)
+        # print 'RESULT',test
 
-        values = []
-        for group in groups:
-            if not '..' in group:
-                values.append(group)
-                continue
-
-            match = re.match(r'(\d+)(\((\+|\-)?(\.?\d+(\.\d+)?)\))?..(\d+)', group)
-            if not match:
-                values.append(group)
-                continue
-
-            first = int(match.group(1))
-            last = int(match.group(6))
-            rate = float(match.group(4)) if match.group(4) else 1
-
-            start = first
-
-            if first > last:
-                while start >= last:
-                    values.append(str(int(math.floor(start))))
-                    start -= abs(rate)
-                continue
-
-            while start <= last:
-                values.append(str(int(math.floor(start))))
-                start += rate
-
-        return ' '.join(values)
 
     def getChip(self):
         if hasattr(self, 'chip'):
@@ -414,3 +436,60 @@ class Instrument(object):
             end += 'MPOF '
 
         return end
+
+
+class MagicMacro(object):
+    def __init__(self, macro):
+        # print "creating object with macro", macro
+        self.macro = macro
+        self.new_macro = macro
+
+    def repeat(self, count):
+        self.new_macro = ((' ' + self.new_macro) * 2).replace('  ', ' ')
+
+    def step(self, rate):
+        first = int(self.macro.split(' ')[0])
+        last = int(self.macro.split(' ').pop())
+        self.new_macro = ' '.join(self.getMagicSteps(first, last, float(rate)))
+
+    def getMagicSteps(self, first, last, rate):
+        values = []
+        start = first
+        if first > last:
+            while start >= last:
+                values.append(str(int(math.floor(start))))
+                start -= abs(rate)
+
+            return values
+
+        while start <= last:
+            values.append(str(int(math.floor(start))))
+            start += rate
+
+        return values
+
+    def processMagicSteps(self, macro):
+        groups = macro.split(' ')
+
+        values = []
+        for group in groups:
+            if not '..' in group:
+                values.append(group)
+                continue
+
+            match = re.match(r'(\d+)(\((\+|\-)?(\.?\d+(\.\d+)?)\))?..(\d+)', group)
+            if not match:
+                values.append(group)
+                continue
+
+            first = int(match.group(1))
+            last = int(match.group(6))
+            rate = float(match.group(4)) if match.group(4) else 1
+
+            values += self.getMagicSteps(first, last, rate)
+
+        return ' '.join(values)
+
+    def __str__(self):
+        macro = self.processMagicSteps(self.new_macro)
+        return macro

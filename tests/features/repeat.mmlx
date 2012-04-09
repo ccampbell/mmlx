@@ -1,0 +1,18 @@
+// repeat1:
+    // volume: (0..4).repeat(5) (5).repeat(25)
+    // volume: [1..15.step(2).repeat(2) 5 4 3 2 1 0].repeat(3)
+    // [1(+2)..15:2 5 4 3 2 1 0].repeat(2)
+    // [1..15].step(2).repeat(2)
+    // volume: 1(+2)..15'2
+
+repeat2:
+    volume: 1..15.step(2).repeat(2)
+
+repeat3:
+    volume: [1..15].step(2).repeat(2)
+
+repeat4:
+    volume: 1(+2)..15.repeat(2)
+
+
+A @repeat2 @repeat3 @repeat4

@@ -25,6 +25,12 @@
 			<string>string.quoted.double</string>
 		</dict>
 		<dict>
+			<key>match</key>
+			<string>'(?=\d+)</string>
+			<key>name</key>
+			<string>keyword.repeat</string>
+		</dict>
+		<dict>
 			<key>begin</key>
 			<string>'</string>
 			<key>end</key>

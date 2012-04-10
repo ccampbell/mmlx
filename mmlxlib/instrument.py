@@ -101,31 +101,37 @@ class Instrument(object):
         # print values
         return values
 
-    # def processRepeats(self, macro):
-    #     if not "'" in macro:
-    #         return macro
+    def findBracketObject(self, macro):
+        open_bracket = 0
+        pos = 0
+        started = False
+        wait_for_end = False
+        start_pos = 0
 
-    #     # group repeats
-    #     match = re.match(r'\((.*)\)\'(\d+)', macro)
+        for char in macro:
+            if wait_for_end and char == ' ':
+                break
 
-    #     if not match:
+            if char == '[':
+                if not started:
+                    start_pos = pos
 
-    #         # single repeat
-    #         match = re.match(r'\b(.*?)\'(\d+)', macro)
+                started = True
+                open_bracket += 1
 
-    #     if not match:
-    #         return macro
-    #     print 'GROUP1',match.group(1)
-    #     print 'GROUP2',match.group(2)
-    #     repeats = int(match.group(2))
-    #     pattern = match.group(1)
-    #     replacement = (pattern + ' ') * repeats
+            if char == ']':
+                open_bracket -= 1
 
-    #     return self.processRepeats(macro.replace(match.group(0), replacement).replace('  ', ' '))
+            if started and open_bracket == 0:
+                wait_for_end = True
+
+            pos += 1
+
+        return re.match(r'(\[(.*)\]((\.[a-zA-Z]{1}.*?\))+))', macro[start_pos:pos])
 
     def magicMacroObjects(self, macro):
         # bracket objects
-        match = re.match(r'(\[(.*)\]((\.[a-zA-Z]{1}.*?\))+))', macro)
+        match = self.findBracketObject(macro)
         original = True
 
         if not match:

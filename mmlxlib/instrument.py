@@ -151,7 +151,6 @@ class Instrument(object):
             # magic = MagicMacro(macro.replace(match.group(1), self.magicMacroObjects(match.group(2)), 1))
 
             methods = match.group(3)[1:-1].split(').')
-            # print 'METHODS',methods,"\n"
             for method in methods:
                 getattr(magic, method.split('(')[0])(*method.split('(')[1].split(','))
 
@@ -452,17 +451,22 @@ class MagicMacro(object):
     def __init__(self, macro):
         # print "creating object with macro", macro
         self.macro = macro
-        self.new_macro = macro
+        self.step_size = None
+        self.repeat_count = None
 
     def repeat(self, count):
-        # print 'repeat', self.new_macro
-        self.new_macro = ((' ' + self.new_macro) * int(count)).replace('  ', ' ')
+        self.repeat_count = int(count)
 
-    def step(self, rate):
-        # print 'calling step with rate',rate,'for macro',self.new_macro
-        first = int(self.macro.split(' ')[0])
-        last = int(self.macro.split(' ').pop())
-        self.new_macro = ' '.join(self.getMagicSteps(first, last, float(rate)))
+    def step(self, size):
+        self.step_size = float(size)
+
+    def processRepeats(self, macro):
+        return ((' ' + macro) * int(self.repeat_count)).replace('  ', ' ')
+
+    def processSteps(self, macro):
+        first = int(macro.split(' ')[0])
+        last = int(macro.split(' ').pop())
+        return ' '.join(self.getMagicSteps(first, last, self.step_size))
 
     def getMagicSteps(self, first, last, rate):
         values = []
@@ -503,5 +507,13 @@ class MagicMacro(object):
         return ' '.join(values)
 
     def __str__(self):
-        macro = self.processMagicSteps(self.new_macro)
+        macro = self.macro
+
+        if self.step_size is not None:
+            macro = self.processSteps(macro)
+
+        if self.repeat_count is not None:
+            macro = self.processRepeats(macro)
+
+        macro = self.processMagicSteps(macro)
         return macro

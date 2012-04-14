@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 from util import Util
+from magicmacro import MagicMacro
 import math
 import re
 
@@ -445,75 +446,3 @@ class Instrument(object):
             end += 'MPOF '
 
         return end
-
-
-class MagicMacro(object):
-    def __init__(self, macro):
-        # print "creating object with macro", macro
-        self.macro = macro
-        self.step_size = None
-        self.repeat_count = None
-
-    def repeat(self, count):
-        self.repeat_count = int(count)
-
-    def step(self, size):
-        self.step_size = float(size)
-
-    def processRepeats(self, macro):
-        return ((' ' + macro) * int(self.repeat_count)).replace('  ', ' ')
-
-    def processSteps(self, macro):
-        first = int(macro.split(' ')[0])
-        last = int(macro.split(' ').pop())
-        return ' '.join(self.getMagicSteps(first, last, self.step_size))
-
-    def getMagicSteps(self, first, last, rate):
-        values = []
-        start = first
-        if first > last:
-            while start >= last:
-                values.append(str(int(math.floor(start))))
-                start -= abs(rate)
-
-            return values
-
-        while start <= last:
-            values.append(str(int(math.floor(start))))
-            start += rate
-
-        return values
-
-    def processMagicSteps(self, macro):
-        groups = macro.split(' ')
-
-        values = []
-        for group in groups:
-            if not '..' in group:
-                values.append(group)
-                continue
-
-            match = re.match(r'(\d+)(\((\+|\-)?(\.?\d+(\.\d+)?)\))?..(\d+)', group)
-            if not match:
-                values.append(group)
-                continue
-
-            first = int(match.group(1))
-            last = int(match.group(6))
-            rate = float(match.group(4)) if match.group(4) else 1
-
-            values += self.getMagicSteps(first, last, rate)
-
-        return ' '.join(values)
-
-    def __str__(self):
-        macro = self.macro
-
-        if self.step_size is not None:
-            macro = self.processSteps(macro)
-
-        if self.repeat_count is not None:
-            macro = self.processRepeats(macro)
-
-        macro = self.processMagicSteps(macro)
-        return macro

@@ -171,13 +171,13 @@ class MusicBox(object):
 
         os.environ['NES_INCLUDE'] = nes_include_path
         command = os.path.join(bin_dir, 'ppmckc') if self.options['local'] else 'ppmckc'
-        subprocess.Popen([command, '-m1', '-i', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # parts = output.communicate()
+        subprocess.Popen([command, '-m1', '-i', path], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+        # print output.communicate()
         # stdout = parts[0]
         # stderr = parts[1]
 
         command = os.path.join(bin_dir, 'nesasm') if self.options['local'] else 'nesasm'
-        subprocess.Popen([command, '-s', '-raw', os.path.join(nes_include_path, 'ppmck.asm')], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.Popen([command, '-s', '-raw', os.path.join(nes_include_path, 'ppmck.asm')], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
         # parts = output.communicate()
         # stdout = parts[0]
         # stderr = parts[1]

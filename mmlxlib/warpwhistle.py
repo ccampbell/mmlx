@@ -829,10 +829,10 @@ class WarpWhistle(object):
                 return new_word
 
             # not a valid instrument
-            if not match.group(3) in self.instruments:
+            if not match.group(3).lower() in self.instruments:
                 return word
 
-            new_instrument = self.instruments[match.group(3)]
+            new_instrument = self.instruments[match.group(3).lower()]
 
             if 'O' in self.current_voices and hasattr(new_instrument, 'timbre'):
                 raise Exception('VRC6 sawtooth (voice O) does not support timbre attribute')

@@ -46,7 +46,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(@[a-z-]{3,}[a-z\-0-9]+)\b</string>
+			<string>(@[a-z-]{3,}[a-zA-Z\-0-9]+)\b</string>
 			<key>name</key>
 			<string>storage.mmlx.instrument</string>
 		</dict>

@@ -1,0 +1,30 @@
+easeInQuad:
+    volume: 0..15.curve('easeInQuad').step(.5)
+
+easeOutQuad:
+    volume: 0..15.curve('easeOutQuad').step(.5)
+
+easeInOutQuad:
+    volume: 0..15.curve('easeInOutQuad').step(.5)
+
+easeInCubic:
+    volume: 0..15.curve('easeInCubic').step(.5)
+
+easeOutCubic:
+    volume: 0..15.curve('easeOutCubic').step(.5)
+
+easeInOutCubic:
+    volume: 0..15.curve('easeInOutCubic').step(.5)
+
+easeInQuart:
+    volume: 0..15.curve('easeInQuart').step(.5)
+
+easeOutQuart:
+    volume: 0..15.curve('easeOutQuart').step(.5)
+
+easeInOutQuart:
+    volume: 0..15.curve('easeInOutQuart').step(.5)
+
+A @easeInQuad @easeOutQuad @easeInOutQuad
+A @easeInCubic @easeOutCubic @easeInOutCubic
+A @easeInQuart @easeOutQuart @easeInOutQuart

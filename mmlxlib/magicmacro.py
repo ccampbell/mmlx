@@ -15,6 +15,7 @@
 # limitations under the License.
 import re
 import math
+from curve import Curve
 
 
 class MagicMacro(object):
@@ -31,8 +32,11 @@ class MagicMacro(object):
     def step(self, size):
         self.step_size = float(size)
 
-    def curve(self, type="+"):
-        self.curve_type = type
+    def curve(self, type=None):
+        if not type:
+            type = "easeInQuad"
+
+        self.curve_type = type.replace('\'', '').replace('"', '')
 
     def processRepeats(self, macro):
         return ((' ' + macro) * int(self.repeat_count)).replace('  ', ' ')
@@ -54,44 +58,16 @@ class MagicMacro(object):
         return c * t * t + b
 
     def processCurve(self, macro):
-        return macro
-        # begin = 0
-        # finish = 15
-        # change = finish - begin
-        # duration = 15
-        # time = 0
+        begin = float(macro.split(' ')[0])
+        end = float(macro.split(' ').pop())
+        change = float(end - begin)
+        duration = change * (1 / self.step_size) if self.step_size is not None else change
 
-        # while time <= duration:
-        #     pos = self.easeInQuad(time, begin, change, duration)
-        #     print math.floor(pos)
+        curve = Curve(begin, end, duration)
+        if hasattr(curve, self.curve_type):
+            return curve.render(self.curve_type)
 
-        #     time += 1
-        #     # print time
-
-        # return macro
-        # first = int(macro.split(' ')[0])
-        # last = int(macro.split(' ').pop())
-        # total_steps = abs(last - first + 1)
-
-        # # xs = [1, int(total_steps / 2), total_steps]
-        # # print self.curve_type
-        # # cushion = (last - first) / 15
-        # # ys = [first, last if self.curve_type == '-' else first + cushion, last]
-        # # print xs, ys
-        # xs = [1, 8, 13]
-        # ys = [3, 3, 15]
-
-        # equation = numpy.poly1d(numpy.polyfit(xs, ys, deg=2))
-
-        # step_size = self.step_size or 1
-        # values = []
-        # i = 1
-        # while i <= total_steps:
-        #     print '(' + str(i) + ', ' + str(int(round(equation(i)))) + ')'
-        #     values.append(str(int(round(equation(i)))))
-        #     i += step_size
-
-        # return " ".join(values)
+        raise Exception('curve doex not exist with type: ' + self.curve_type)
 
     def getMagicSteps(self, first, last, rate):
         values = []
@@ -137,7 +113,7 @@ class MagicMacro(object):
         if self.curve_type is not None:
             return self.processCurve(macro)
 
-        if self.step_size is not None:
+        if self.curve_type is None and self.step_size is not None:
             macro = self.processSteps(macro)
 
         if self.repeat_count is not None:

@@ -207,7 +207,7 @@
 				<key>1</key>
 				<dict>
 					<key>name</key>
-					<string>entity.instrument</string>
+					<string>entity.other.attribute-name.instrument</string>
 				</dict>
 			</dict>
 			<key>match</key>
